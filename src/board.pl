@@ -35,3 +35,37 @@ display_board([]).
 display_board([Row|RemainingRows]):-
     display_row(Row), nl,
     display_board(RemainingRows).
+
+% left
+/* bw */
+/* bw */
+orientation(left,[black,white,black,white]).
+
+% right
+/* wb */
+/* wb */
+orientation(right,[white,black,white,black]).
+
+% right
+/* bb */
+/* ww */
+orientation(up,[black,black,white,white]).
+
+% down
+/* ww */
+/* bb */
+orientation(down,[white,white,black,black]).
+
+place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
+  X1 is X+1,
+  Y1 is Y+1,
+  orientation(Orientation,[C1,C2,C3,C4]),
+  place_square(LastBoard,X-Y,C1,NextBoard),
+  place_square(NextBoard,X-Y1,C2,NextNextBoard),
+  place_square(NextNextBoard,X1-Y,C3,NextNextNextBoard),
+  place_square(NextNextNextBoard,X1-Y1,C4,NewBoard).
+
+place_square(LastBoard,XCoord-YCoord,NewValue,NewBoard) :-
+  nth(XCoord,LastBoard,Line),
+  replace(YCoord,Line,NewValue,NewLine),
+  replace(XCoord,LastBoard,NewLine,NewBoard).

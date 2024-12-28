@@ -41,16 +41,33 @@ display_game([Board,_,_,_]) :-
 
 run :-
     initial_state([5,bot-bot],GameState),
-    display_game(GameState).
+    display_game(GameState),
+    move(GameState,1-1,NewGameState),
+    display_game(NewGameState).
+
+test_place :-
+  default(Element),
+  create_board(Element,5,CurrentBoard),
+  display_board(CurrentBoard),
+  nl,
+  place_piece(CurrentBoard,1-1,left,NewBoardLeft),
+  display_board(NewBoardLeft),
+  nl,
+  place_piece(CurrentBoard,1-1,right,NewBoardRight),
+  display_board(NewBoardRight),
+  nl,
+  place_piece(CurrentBoard,1-1,up,NewBoardUp),
+  display_board(NewBoardUp),
+  nl,
+  place_piece(CurrentBoard,1-1,down,NewBoardDown),
+  display_board(NewBoardDown).
+  
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
-move()
-
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
-
 
 % game_over(+GameState, -Winner)
 % checks if the game is over in the current game state
@@ -58,7 +75,6 @@ move()
 
 % value(+GameState, +Player, -Value)
 % returns how good/bad is the current game state to player
-
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
