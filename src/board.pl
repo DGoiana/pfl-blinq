@@ -18,9 +18,9 @@ create_board(Element, Size, Board):-
 
 % display_item(+Item)
 % prints an element
-display_item(Item):- 
+display_item(Item-Layer):- 
     char(Item, C), 
-    write(C).
+    write(C-Layer).
 
 % display_row(+List)
 % display a row of the board
@@ -56,6 +56,8 @@ orientation(up,[black,black,white,white]).
 /* bb */
 orientation(down,[white,white,black,black]).
 
+% place_piece(+LastBoard,+Coords,+Orientation,-NewBoard)
+% puts a given piece (based on its orientation) in the board
 place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
   X1 is X+1,
   Y1 is Y+1,
@@ -65,7 +67,11 @@ place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
   place_square(NextNextBoard,X1-Y,C3,NextNextNextBoard),
   place_square(NextNextNextBoard,X1-Y1,C4,NewBoard).
 
-place_square(LastBoard,XCoord-YCoord,NewValue,NewBoard) :-
+% place_square(+LastBoard,+Coords,+NewValue,-NewBoard)
+% places a value in a square on the board
+place_square(LastBoard,XCoord-YCoord,Color,NewBoard) :-
   nth(XCoord,LastBoard,Line),
-  replace(YCoord,Line,NewValue,NewLine),
+  nth(YCoord,Line,_-Layer),
+  NewLayer is Layer+1,
+  replace(YCoord,Line,Color-NewLayer,NewLine),
   replace(XCoord,LastBoard,NewLine,NewBoard).
