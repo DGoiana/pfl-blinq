@@ -20,7 +20,7 @@ create_board(Element, Size, Board):-
 % prints an element
 display_item(Item-Layer):- 
     char(Item, C), 
-    write(C-Layer).
+    write(C-Layer), write(' ').
 
 % display_row(+List)
 % display a row of the board

@@ -32,12 +32,12 @@ initial_state(GameConfig, GameState) :-
   BoardSize is GameSize*2, % each square needs to be 2x2 
   create_board(Element, BoardSize, CurrentBoard),
   get_pieces(GameSize,StartPieces),
-  GameState = [CurrentBoard, white, PType1-StartPieces, PType2-StartPieces].
+  GameState = [CurrentBoard, white, PType1-StartPieces, PType2-StartPieces,0].
 
 % display_game(+GameState)
 % prints the game state to the terminal
 display_game(GameState) :-
-    GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack],
+    GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
     nl,
     write('Blinq'),nl,
     write('--------------------'),nl,
@@ -46,70 +46,75 @@ display_game(GameState) :-
     format('White Pieces: ~d',PiecesWhite), nl,
     format('Black Type : ~s',PlayerTypeBlack), nl,
     format('Black Pieces: ~d',PiecesBlack), nl,
+    format('Max Layer: ~d',MaxLayer), nl,
     write('--------------------'), nl,
 
     display_board(CurrentBoard).
 
-% test_place()
-% tests piece placement
-test_place :-
-  default(Element),
-  create_board(Element,10,CurrentBoard),
-  display_board(CurrentBoard),
-  nl,
-  place_piece(CurrentBoard,1-1,left,NewBoardLeft),
-  display_board(NewBoardLeft),
-  nl,
-  place_piece(CurrentBoard,1-1,right,NewBoardRight),
-  display_board(NewBoardRight),
-  nl,
-  place_piece(CurrentBoard,1-1,up,NewBoardUp),
-  display_board(NewBoardUp),
-  nl,
-  place_piece(CurrentBoard,1-1,down,NewBoardDown),
-  display_board(NewBoardDown).
-
-% switch_player(+CurrentPlayer,-NewPlayer)
-% changes players
-switch_player(black,white).
-switch_player(white,black).
-
-% change_pieces(+CurrentPlayer,+CurrentWhitePieces,+CurrentBlackPieces,-NewWhitePieces,-NewBlackPieces)
-% decreases the number of pieces according to player
-change_pieces(white,CurrentWhitePieces,CurrentBlackPieces,NewWhitePieces,CurrentBlackPieces) :-
-  NewWhitePieces is CurrentWhitePieces-1.
-change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,NewBlackPieces) :-
-  NewBlackPieces is CurrentBlackPieces-1.
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
 move(GameState,X-Y,Orientation,NewGameState) :-
-  GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack],
+  GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
   switch_player(CurrentPlayer,NewPlayer),
-  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack].
-
-test_move :-
-  menu(GameConfig),
-  initial_state(GameConfig,GameState),
-  display_game(GameState),
-  move(GameState,1-1,left,NewGameState),
-  display_game(NewGameState).
+  get_piece(CurrentBoard,X-Y,_-Layer),
+  gt(Layer,MaxLayer,NewMaxLayer),
+  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
 % case 1: piece is empty
 % case 2: there is 2x2 plataform with the same Layer
+valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
+  length(Board,BoardLength),
+  Max is BoardLength-2,
+  findall(X-Y, (
+    between(0, Max, X), X mod 2 =:= 0,
+    between(0, Max, Y), Y mod 2 =:= 0,
+    is_empty(Board, X-Y)
+  ),EmptyMoves),
+	NewMaxLayer is MaxLayer+1,
+	get_plataforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
+	append(EmptyMoves,PlatformMoves,ListOfMoves).
 
+% get_plataforms(+Board,+BoardSize,+Layer,-Moves)
+% gets all availables moves atop 2x2 plataforms from MaxLayer to 1.
+get_plataforms(_,_,1,[]).
+get_plataforms(Board,BoardSize,Layer,Moves) :-
+	Layer > 1,
+	NewLayer is Layer-1,
+	get_plataforms(Board,BoardSize,NewLayer,NewMoves),
+	get_layer_plataform(Board,BoardSize,NewLayer,Result),
+	append(NewMoves,Result,Moves).
+
+% get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
+% gets all available moves atop 2x2 plataforms in a given layer
+get_layer_plataform(Board,BoardSize,Layer,Moves) :-
+  findall(X-Y, (
+    between(0, BoardSize, X), X mod 2 =:= 0,
+    between(0, BoardSize, Y), Y mod 2 =:= 0,
+		get_piece(Board,X-Y,_-Layer),
+    check_plataform(Board, X-Y,Layer)
+  ),Plataforms),
+	maplist(plus_one,Plataforms,Moves).
+
+% check_plataform(+Board,+Coords,+Layer)
+% determines if there is a plataform starting on Coords
+check_plataform(Board,X-Y,Layer) :-
+	X2 is X+2,
+	Y2 is Y+2,
+	get_piece(Board,X-Y,_-Layer),
+	get_piece(Board,X2-Y,_-Layer),
+	get_piece(Board,X-Y2,_-Layer),
+	get_piece(Board,X2-Y2,_-Layer).
 
 % game_over(+GameState, -Winner)
 % checks if the game is over in the current game state
 % case 1: one of the players win (kinda dfs)
 % case 2: one player loses all pieces (if the other player )
 % case 3: both players lose all pieces (draw)
-/* game_over(GameState, Winner) :-
-  GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack], */
   
 
 

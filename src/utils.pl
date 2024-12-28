@@ -1,9 +1,3 @@
-% between(+Min,+Max,?Value)
-% determines if a number is between range
-between(Min,Max,Value) :-
-  Value @>= Min,
-  Value @=< Max.
-
 % get_input(+Min,+Max,-Value)
 % gets an input value from user until the value is in range (Min,Max)
 get_input(Min,Max,Value) :-
@@ -18,7 +12,6 @@ get_pieces(5,27).
 get_pieces(BoardSize,Pieces) :-
   BoardSize =\= 5,
   Pieces is BoardSize * 5.
-
 
 % replace(+Index,+List,+Value,-NewList)
 % replaces a list element with another
@@ -35,3 +28,43 @@ replace(Index,[H | T],Elem,L2,Result) :-
 nth(N,List,Elem) :- 
   length(Prefix,N),
   append(Prefix,[Elem | _],List).
+
+% get_piece(+Board,+Coords,-Piece)
+% gets a piece from its coordinates
+get_piece(Board,X-Y,Piece) :-
+  nth(Y,Board,Line),
+  nth(X,Line,Piece).
+
+% is_empty(+Board,+Coord)
+% checks if piece is empty
+is_empty(Board,X-Y) :-
+  get_piece(Board,X-Y,empty-0).
+
+% gt(+X,+Y,-Z)
+% returns the maximum between two values
+gt(X,Y,Z) :- Z is max(X,Y) .
+
+% plus_one(+Coords,-NewCoords)
+% adds an offset of 1 to coordinates
+plus_one(X-Y,NewX-NewY) :-
+	NewX is X+1,
+	NewY is Y+1.
+
+% maplist(+Predicate,+List,-Result)
+% Applies the Predicate to all elements of List
+maplist(_, [], []).
+maplist(Pred, [X|Xs], [Y|Ys]) :-
+    call(Pred, X, Y), 
+    maplist(Pred, Xs, Ys).
+
+% switch_player(+CurrentPlayer,-NewPlayer)
+% changes players
+switch_player(black,white).
+switch_player(white,black).
+
+% change_pieces(+CurrentPlayer,+CurrentWhitePieces,+CurrentBlackPieces,-NewWhitePieces,-NewBlackPieces)
+% decreases the number of pieces according to player
+change_pieces(white,CurrentWhitePieces,CurrentBlackPieces,NewWhitePieces,CurrentBlackPieces) :-
+  NewWhitePieces is CurrentWhitePieces-1.
+change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,NewBlackPieces) :-
+  NewBlackPieces is CurrentBlackPieces-1.

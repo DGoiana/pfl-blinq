@@ -34,5 +34,5 @@ menu([BoardSize,GameType]) :-
   write('2- Bot-Player'), nl,
   write('3- Player-Player'), nl,
   write('Type:'),
-  get_input(1,4,Type),
+  get_input(1,3,Type),
   get_type(Type,GameType).
