@@ -46,7 +46,7 @@ orientation(left,[black,white,black,white]).
 /* wb */
 orientation(right,[white,black,white,black]).
 
-% right
+% up
 /* bb */
 /* ww */
 orientation(up,[black,black,white,white]).

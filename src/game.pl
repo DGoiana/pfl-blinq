@@ -2,7 +2,7 @@
 
 % Appealing and intuitive 
 % visualizations will be valued. Flexible  game state representations and visualization predicates will 
-% also  be  valued,  for  instance  those  that  work  with  any  board  size
+% also  be  valued,  for  instance  those  that  work  with  any    size
 
 % If any configuration is required (beyond the standard installation of the software), or a font other 
 % than the default one is used, this must be expressed in the README file, which must also include the steps 
@@ -11,6 +11,8 @@
 :- consult(board).
 :- consult(utils).
 :- consult(menu).
+
+:- use_module(library(lists)).
 
 default(empty-0).
 
@@ -110,6 +112,13 @@ check_plataform(Board,X-Y,Layer) :-
 	get_piece(Board,X-Y2,_-Layer),
 	get_piece(Board,X2-Y2,_-Layer).
 
+
+result(-1, neutral).
+result(0, draw).
+result(1, white).
+result(2, black).
+
+
 % game_over(+GameState, -Winner)
 % checks if the game is over in the current game state
 % case 1: one of the players win (kinda dfs)
@@ -117,6 +126,74 @@ check_plataform(Board,X-Y,Layer) :-
 % case 3: both players lose all pieces (draw)
   
 
+
+% check_winner(+Board, -Winner)
+% checks if anyone has won the game in the current board
+check_winner(Board, Player) :- 
+  dfs(Board, Player, Winner),
+  Player = Winner.
+
+% dfs(+Board, +Player, -Won)
+% performs a dfs to see if the player has already won the game
+dfs(Board, white, Won) :-
+  findall(0-Y, (nth0(0, Board, Row), (nth0(Y, Row, white-_))), Pieces),
+  member(Start, Pieces),
+  dfs_visit(Board, white, [Start], [], Won).
+
+dfs(Board, black, Won) :-
+  findall(X-0, (nth0(X, Board, Row), (nth0(0, Row, black-_))), Pieces),
+  member(Start, Pieces),
+  dfs_visit(Board, black, [Start], [], Won).
+  
+% dfs_visit(+Board, +Player, +ToVisit, +AlreadyVisited, -Won)
+% helper function for dfs traversal
+dfs_visit(_, _, [], _, false).
+dfs_visit(Board, Player, [Current|_], _, Player) :-
+  Current = X-Y,
+  end_game(Board, X-Y, Player).
+dfs_visit(Board, Player, [Current|ToVisit], Visited, Won) :-
+  Current = X-Y,
+  findall(Next, (neighbor(X-Y, Next), within_coords(Board, Next), \+ member(Next, Visited), \+ member(Next, ToVisit), check_color(Board, Current, Next)), Neighbors),
+  append(Neighbors, ToVisit, NewToVisit),
+  sort(NewToVisit, SortedToVisit),
+  dfs_visit(Board, Player, SortedToVisit, [Current|Visited], Won).
+
+% neighbor(+Coords, -NeighborCoords)
+% return neighbor coords
+neighbor(X-Y, X1-Y) :- X1 is X + 1.
+neighbor(X-Y, X1-Y) :- X1 is X - 1.
+neighbor(X-Y, X-Y1) :- Y1 is Y + 1.
+neighbor(X-Y, X-Y1) :- Y1 is Y - 1.
+
+% end_game(+Coords, +Player)
+% check if any player has a win condition
+end_game(Board, Coords, white) :-
+  Coords = X-_,
+  length(Board, Size),
+  X is Size - 1.
+
+end_game(Board, Coords, black) :-
+  Coords = _-Y,
+  length(Board, Size),
+  Y is Size - 1.
+
+% within_coords(+Board, +Coords)
+% check if move is within valid coords
+within_coords(Board, X-Y) :-
+  length(Board, Size),
+  NewSize is Size - 1,
+  between(0, NewSize, X),
+  between(0, NewSize, Y).
+
+% check_color(+Board, +CoordsCurrent, +CoordsNext)
+% check if the color from the next neigbor is the same as the current
+check_color(Board, X1-Y1, X2-Y2) :-
+  nth0(X1, Board, Row1),
+  nth0(Y1, Row1, Color1-_),
+  nth0(X2, Board, Row2),
+  nth0(Y2, Row2, Color2-_),
+  Color1 = Color2.
+  
 
 % value(+GameState, +Player, -Value)
 % returns how good/bad is the current game state to player
