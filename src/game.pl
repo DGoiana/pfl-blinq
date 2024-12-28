@@ -9,6 +9,8 @@
 % required to configure and/or install the necessary components (on Windows and Linux)
 
 :- consult(board).
+:- consult(utils).
+:- consult(menu).
 
 default(empty).
 
@@ -16,31 +18,15 @@ char(black,'b').
 char(white,'w').
 char(empty,'e').
 
-% TEST DISPLAY
-
-get_board(N,Board) :-
-    default(Element),
-    create_board(Element,N,Board),
-    display_board(Board).
-
-   
 % play()
 % gives access to menu and starts game cycle
-
-
-% menu(-GameConfig)
-% prints menu
-menu :- 
-   write('teste'), nl,
-   write('teste2').
+play :- 
+  menu(GameConfig),
+  initial_state(GameConfig,GameState).
 
 
 % initial_state(+GameConfig, -GameState)
 % returns the initial game state giving a game configuration
-% GameConfig: boardSize, gameType(bot-bot,bot-player,player-player)
-% GameState: board, current_player, playerType(easyBot,hardBot,player)-remainingPieces, playerType-remainingPieces
-% InitialGameState: [], white, type-54, type-54
-
 initial_state(GameConfig, GameState) :-
    default(Element),
    GameConfig = [BoardSize, PType1-PType2],
