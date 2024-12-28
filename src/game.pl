@@ -20,18 +20,19 @@ char(empty,'e').
 
 % play()
 % gives access to menu and starts game cycle
-play :- 
+play(GameState) :- 
   menu(GameConfig),
   initial_state(GameConfig,GameState).
-
 
 % initial_state(+GameConfig, -GameState)
 % returns the initial game state giving a game configuration
 initial_state(GameConfig, GameState) :-
-   default(Element),
-   GameConfig = [BoardSize, PType1-PType2],
-   create_board(Element, BoardSize, CurrentBoard),
-   GameState = [CurrentBoard, white, PType1-54, PType2-54].
+  default(Element),
+  GameConfig = [GameSize, PType1-PType2],
+  BoardSize is GameSize*2, % each square needs to be 2x2 
+  create_board(Element, BoardSize, CurrentBoard),
+  get_pieces(GameSize,StartPieces),
+  GameState = [CurrentBoard, white, PType1-StartPieces, PType2-StartPieces].
 
 % display_game(+GameState)
 % prints the game state to the terminal
@@ -44,6 +45,7 @@ run :-
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
+move()
 
 
 % valid_moves(+GameState, -ListOfMoves)

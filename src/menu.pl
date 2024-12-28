@@ -25,10 +25,10 @@ get_type(1,GameType) :-
 
 % menu(-GameConfig)
 % prints menu and defines GameConfig
-menu([GameSize,GameType]) :- 
+menu([BoardSize,GameType]) :- 
   write('Blinq'), nl,
-  write('Game Size:'),
-  get_input(1,10,GameSize),
+  write('Board Size:'),
+  get_input(1,10,BoardSize),
   write('Game Type'), nl,
   write('1- Bot-Bot'), nl,
   write('2- Bot-Player'), nl,
