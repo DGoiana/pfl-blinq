@@ -74,13 +74,21 @@ display_game(GameState) :-
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
 move(GameState,X-Y-Orientation,NewGameState) :-
+  write(GameState),
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
+  write('wtd2'),
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
+  write('wtd2'),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
+  write('wtd2'),
   switch_player(CurrentPlayer,NewPlayer),
+  write('wtd2'),
   get_piece(NewBoard,X-Y,_-Layer),
+  write('wtd2'),
   gt(Layer,MaxLayer,NewMaxLayer),
-  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
+  write('wtd2'),
+  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer],
+  write('wtd2').
 
 check_valid_move(GameState,X-Y-_) :-
   valid_moves(GameState,ValidMoves),
@@ -222,39 +230,38 @@ check_color(Board, X1-Y1, X2-Y2) :-
 % returns how good/bad is the current game state to player
 % currently sees the minimum distance of a piece to the finish line
 value([Board, _, _, _, _], white, Value) :-
-  findall(Distance, (
-    nth0(X, Board, Row),
-    nth0(Y, Row, white-_),
-    length(Board, Size),
-    Distance is Size - 1 - X
-    ), Distances),
-    min_list(Distances, MinDistance),
-    Value is 100 - MinDistance. % 100 is the max size??
+  
 
 value([Board, _, _, _, _], black, Value) :-
-  findall(Distance, (
-    nth0(X, Board, Row),
-    nth0(Y, Row, black-_),
-    length(Board, Size),
-    Distance is Size - 1 - Y
-  ), Distances),
-  min_list(Distances, MinDistance),
-  Value is 100 - MinDistance. % 100 is the max size?? 
+  
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
 % for human players, it interacts with the user to read the move
-choose_move([Board, white, hardBot-_, _-_, MaxLayer], hard, Move) :-
-  PossibleOrientations = [left, right, up, down],
+choose_move([Board, white, hardBot-WhitePiecesLeft, _-_, MaxLayer], hard, Move) :-
   valid_moves([Board, _, _, _, MaxLayer], Moves),
-  findall(Value-Move-Orientation, (
+  write(Moves),
+  findall(Value-Move, (
     member(Move, Moves), 
-    member(Orientation, PossibleOrientations), 
-    move([Board, white, hardBot-_, _-_, MaxLayer], Move, Orientation, NewGameState),
+    move([Board, white, hardBot-WhitePiecesLeft, _-_, MaxLayer], Move, NewGameState),
     value(NewGameState, white, Value)
   ), ScoredMoves),
-  max_member(_-BestMove-BestOrientation, ScoredMoves),
-  Move = BestMove-BestOrientation.
+  write('wtf'),
+  max_member(_-BestMove, ScoredMoves),
+  write('wtf'),
+  Move = BestMove.
+
+choose_move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer], hard, Move) :-
+  valid_moves([Board, _, _, _, MaxLayer], Moves),
+  findall(Value-Move, (
+    member(Move, Moves), 
+    move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer], Move, NewGameState),
+    value(NewGameState, black, Value)
+  ), ScoredMoves),
+  write('wtf'),
+  max_member(_-BestMove, ScoredMoves),
+  write('wtf'),
+  Move = BestMove.
 
 choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :- 
   valid_moves([Board,_,_,_,MaxLayer],Moves),

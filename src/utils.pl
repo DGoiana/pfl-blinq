@@ -52,7 +52,7 @@ gt(X,Y,Z) :- Z is max(X,Y) .
 
 % plus_one(+Coords,-NewCoords)
 % adds an offset of 1 to coordinates
-plus_one(X-Y,NewX-NewY) :-
+plus_one(X-Y-_,NewX-NewY-_) :-
 	NewX is X+1,
 	NewY is Y+1.
 
@@ -64,8 +64,10 @@ switch_player(white,black).
 % change_pieces(+CurrentPlayer,+CurrentWhitePieces,+CurrentBlackPieces,-NewWhitePieces,-NewBlackPieces)
 % decreases the number of pieces according to player
 change_pieces(white,CurrentWhitePieces,CurrentBlackPieces,NewWhitePieces,CurrentBlackPieces) :-
+  write(CurrentWhitePieces),
   NewWhitePieces is CurrentWhitePieces-1.
 change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,NewBlackPieces) :-
+  write(CurrentBlackPieces),
   NewBlackPieces is CurrentBlackPieces-1.
 
 % hl(+BoardSize)
