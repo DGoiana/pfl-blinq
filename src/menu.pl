@@ -61,9 +61,9 @@ get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
   get_input(0,Max,YInput),
   get_orientation(Orientation),
   convert_coords(XInput-YInput,BoardSize,X-Y),
-  write(X-Y),nl,
-  write(XInput-YInput),nl,
-  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  write(X-Y-Orientation),nl,
+  write(XInput-YInput-Orientation),nl,
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y-Orientation),
   !.
 
 % menu(-GameConfig)

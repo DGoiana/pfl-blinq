@@ -243,9 +243,18 @@ value([Board, _, _, _, _], black, Value) :-
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
 % for human players, it interacts with the user to read the move
-/*
-choose_move([Board,white,hardBot-WhitePieces,BlackType-BlackPieces,MaxLayer],X-Y) :- .
-*/
+choose_move([Board, white, hardBot-_, _-_, MaxLayer], hard, Move) :-
+  PossibleOrientations = [left, right, up, down],
+  valid_moves([Board, _, _, _, MaxLayer], Moves),
+  findall(Value-Move-Orientation, (
+    member(Move, Moves), 
+    member(Orientation, PossibleOrientations), 
+    move([Board, white, hardBot-_, _-_, MaxLayer], Move, Orientation, NewGameState),
+    value(NewGameState, white, Value)
+  ), ScoredMoves),
+  max_member(_-BestMove-BestOrientation, ScoredMoves),
+  Move = BestMove-BestOrientation.
+
 choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :- 
   write('wtf'),
   valid_moves([Board,_,_,_,MaxLayer],Moves),
@@ -254,9 +263,9 @@ choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :-
   write('wtf3').
 choose_move([Board,white,player-_,_-_,MaxLayer], _ , X-Y-Orientation) :-
   nl,
-  write('White to move'), nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
+  write('White to move'), nl,
   write('--------------------'),nl,
 
   get_move([Board,_,_,_,MaxLayer],X-Y,Orientation).

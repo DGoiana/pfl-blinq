@@ -95,7 +95,7 @@ convert_coords(X-Y,BoardSize,NewX-NewY) :-
   NewX is X-1.
 
 number_line(N) :-
-  write('  '),
+  write('x '),
   number_line(N,N),
   write('|').
 number_line(0,_).

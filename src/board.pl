@@ -45,6 +45,7 @@ display_board(Board) :-
     length(Board,BoardSize),
     NewBoardSize is BoardSize*3+1,
     number_line(BoardSize), nl,
+    write('y'),nl,
     display_board(Board,NewBoardSize,0),
     write('  '),hl(NewBoardSize),nl.
 
