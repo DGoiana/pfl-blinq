@@ -81,6 +81,7 @@ hl(BoardSize) :-
 % displays a horizontal line of size BoardSize if CurrentLine is even
 pair_hl(CurrentLine,BoardSize) :-
     CurrentLine mod 2 =:= 0,
+    write('  '),
     hl(BoardSize),nl.
 
 % pair_vl(+CurrentLine,+BoardSize)
@@ -88,3 +89,47 @@ pair_hl(CurrentLine,BoardSize) :-
 pair_vl(CurrentElement) :-
     CurrentElement mod 2 =:= 0,
     write('| ').
+
+convert_coords(X-Y,BoardSize,NewX-NewY) :-
+  NewY is BoardSize-Y,
+  NewX is X-1.
+
+number_line(N) :-
+  write('  '),
+  number_line(N,N),
+  write('|').
+number_line(0,_).
+number_line(N,Max) :-
+  N > 0,
+  N1 is N-1, 
+  N2 is N-2,
+  Current is Max-N1,
+  Current2 is Max-N2,
+  Current >= 10,
+  Current2 >= 10,
+  format('|~d ~d',[Current,Current2]),
+  number_line(N2,Max).
+number_line(N,Max) :-
+  N > 0,
+  N1 is N-1, 
+  N2 is N-2,
+  Current is Max-N1,
+  Current2 is Max-N2,
+  Current2 >= 10,
+  format('| ~d ~d',[Current,Current2]),
+  number_line(N2,Max).
+number_line(N,Max) :-
+  N > 0,
+  N1 is N-1, 
+  N2 is N-2,
+  Current is Max-N1,
+  Current2 is Max-N2,
+  format('| ~d ~d ',[Current,Current2]),
+  number_line(N2,Max).
+/* number_line(N,Max) :-
+  N > 0,
+  N1 is N-1, 
+  Current is Max-N1,
+  Current >= 10,
+  format('|~d',Current ),
+  number_line(N1,Max). */

@@ -28,6 +28,8 @@ convert_orientation(2,right).
 convert_orientation(3,up).
 convert_orientation(4,down).
 
+% get_orientation(-Orientation)
+% gets the desired orientation of a move from the user
 get_orientation(Orientation) :-
   write('1- bw'), nl,
   write('   bw'), nl,
@@ -43,6 +45,26 @@ get_orientation(Orientation) :-
   write('Orientation:'),
   get_input(1,4,OrientationInput),
   convert_orientation(OrientationInput,Orientation).
+
+% get_orientation(+GameState,-Coords,-Orientation)
+% gets the desired move from the user
+get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
+  valid_moves([Board,_,_,_,MaxLayer],Moves),
+  write(Moves), nl,
+
+  length(Board,BoardSize),
+  Max is BoardSize-1,
+  repeat,
+  write('X Coord:'),
+  get_input(0,Max,XInput),
+  write('Y Coord:'),
+  get_input(0,Max,YInput),
+  get_orientation(Orientation),
+  convert_coords(XInput-YInput,BoardSize,X-Y),
+  write(X-Y),nl,
+  write(XInput-YInput),nl,
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  !.
 
 % menu(-GameConfig)
 % prints menu and defines GameConfig

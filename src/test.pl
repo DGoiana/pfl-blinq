@@ -63,10 +63,11 @@ test_valid_moves :-
 test_choose_move :-
   GameConfig = [5,player-player],
   initial_state(GameConfig,GameState),
-  display_game(GameState),
+  %display_game(GameState),
   choose_move(GameState,Move,Orientation),
   move(GameState,Move,Orientation,NewGameState),
-  display_game(NewGameState).
+  display_game(NewGameState),
+  test_choose_move.
 
 test_random_move :-
   GameConfig = [5,easyBot-player],
