@@ -220,8 +220,38 @@ check_color(Board, X1-Y1, X2-Y2) :-
   Color1 = Color2.
 
 % value(+GameState, +Player, -Value)
-% returns how good/bad is the current game state to player
-% currently sees the minimum distance of a piece to the finish line
+% scores the current game state
+value([Board, _, _, _, _], Player, Value) :-
+  findall(SeqLength, (
+    nth0(X, Board, Row),
+    nth0(Y, Row, Player-_),
+    longest_sequence(Board, X-Y, Player, SeqLength)
+  ), Sequences),
+  max_member( Value, Sequences).
+
+% longest_sequence(+Board, +Coords, +Player, -Length)
+% finds the longest sequence of same-colored squares starting from coords
+longest_sequence(Board, X-Y, Player, Length) :-
+  findall(L, (
+    neighbor(X-Y, NX-NY),
+    within_coords(Board, NX-NY),
+    check_color(Board, X-Y, NX-NY),
+    sequence_length(Board, NX-NY, Player, [X-Y], L)
+  ), Lengths),
+  max_member(Length, [1|Lengths]).
+
+% sequence_length(+Board, +Coords, +Player, +Visited, -Length)
+% helper function to calculate the length of a sequence
+sequence_length(Board, X-Y, Player, Visited, Length) :-
+  findall(L, (
+    neighbor(X-Y, NX-NY),
+    within_coords(Board, NX-NY),
+    check_color(Board, X-Y, NX-NY),
+    \+ member(NX-NY, Visited),
+    sequence_length(Board, NX-NY, Player, [X-Y|Visited], L)
+  ), Lengths),
+  max_member(MaxLength,[1|Lengths]),
+  Length is MaxLength + 1.
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
