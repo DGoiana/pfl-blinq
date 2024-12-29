@@ -30,14 +30,17 @@ play :-
 
 % game_loop(+GameState)
 % loop of the main game
-game_loop(GameState) :-
+/*game_loop(GameState) :-
   GameState = [_,CurrentPlayer,_,_,_],
   game_over(GameState,CurrentPlayer),
-  show_winner(CurrentPlayer), !.
+  show_winner(CurrentPlayer), !.*/
+
 game_loop(GameState) :-
   display_game(GameState),
-  choose_move(GameState,Move,Orientation),
-  move(GameState,Move,Orientation,NewGameState),
+  write('teste'),
+  choose_move(GameState, _, Move),
+  write('teste2'),
+  move(GameState,Move,NewGameState),
   game_loop(NewGameState).
 
 % initial_state(+GameConfig, -GameState)
@@ -70,18 +73,18 @@ display_game(GameState) :-
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
-move(GameState,X-Y, Orientation,NewGameState) :-
+move(GameState,X-Y-Orientation,NewGameState) :-
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
-  place_piece(CurrentBoard,X-Y, Orientation,NewBoard),
+  place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
   switch_player(CurrentPlayer,NewPlayer),
   get_piece(CurrentBoard,X-Y,_-Layer),
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
-check_valid_move(GameState,X-Y) :-
+check_valid_move(GameState,X-Y-_) :-
   valid_moves(GameState,ValidMoves),
-  member(X-Y,ValidMoves).
+  member(X-Y-_,ValidMoves).
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
@@ -90,10 +93,11 @@ check_valid_move(GameState,X-Y) :-
 valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
   length(Board,BoardLength),
   Max is BoardLength-2,
-  findall(X-Y, (
+  findall(X-Y-Orientation, (
     between(0, Max, X), X mod 2 =:= 0,
     between(0, Max, Y), Y mod 2 =:= 0,
-    is_empty(Board, X-Y)
+    is_empty(Board, X-Y),
+    member(Orientation, [left, right, up, down])
   ),EmptyMoves),
 	NewMaxLayer is MaxLayer+1,
 	get_platforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
@@ -112,11 +116,12 @@ get_platforms(Board,BoardSize,Layer,Moves) :-
 % get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
 % gets all available moves atop 2x2 platforms in a given layer
 get_layer_plataform(Board,BoardSize,Layer,Moves) :-
-  findall(X-Y, (
+  findall(X-Y-Orientation, (
     between(0, BoardSize, X), X mod 2 =:= 0,
     between(0, BoardSize, Y), Y mod 2 =:= 0,
 		get_piece(Board,X-Y,_-Layer),
-    check_plataform(Board, X-Y,Layer)
+    check_plataform(Board, X-Y,Layer),
+    member(Orientation, [left, right, up, down])
   ),Platforms),
 	maplist(plus_one,Platforms,Moves).
 
@@ -242,12 +247,13 @@ value([Board, _, _, _, _], black, Value) :-
 /*
 choose_move([Board,white,hardBot-WhitePieces,BlackType-BlackPieces,MaxLayer],X-Y) :- .
 */
-choose_move([Board,white,easyBot-_,_-_,MaxLayer],X-Y,Orientation) :- 
-  PossibleOrientations = [left,right,up,down],
+choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :- 
+  write('wtf'),
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  random_member(Orientation,PossibleOrientations),
-  random_member(X-Y, Moves).
-choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
+  write(Moves),
+  random_member(X-Y-Orientation, Moves),
+  write('wtf3').
+choose_move([Board,white,player-_,_-_,MaxLayer], _ , X-Y-Orientation) :-
   nl,
   write('White to move'), nl,
   write('Blinq'),nl,
@@ -255,7 +261,8 @@ choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
   write('--------------------'),nl,
 
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  write(Moves), nl,
+  Moves = X-Y-Orientation,
+  write(X-Y), nl,
 
   length(Board,N),
   Max is N-1,
@@ -265,17 +272,15 @@ choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
   write('Y Coord:'),
   get_input(0,Max,Y),
   get_orientation(Orientation),
-  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y-Orientation),
   !.
 /* 
 choose_move([Board,black,WhiteType-WhitePieces,hardBot-BlackPieces,MaxLayer],X-Y) :- .
 */
-choose_move([Board,black,_-_,easyBot-_,MaxLayer],X-Y,Orientation) :- 
-  PossibleOrientations = [left,right,up,down],
+choose_move([Board,black,_-_,easyBot-_,MaxLayer], _ , X-Y-Orientation) :- 
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  random_member(Orientation,PossibleOrientations),
-  random_member(X-Y, Moves).
-choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :- 
+  random_member(X-Y-Orientation, Moves).
+choose_move([Board,black,_-_,player-_,MaxLayer], _ , X-Y-Orientation) :- 
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
@@ -293,18 +298,16 @@ choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :-
   write('Y Coord:'),
   get_input(0,Max,Y),
   get_orientation(Orientation),
-  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y-Orientation),
   !.
 
 % choose_move(+GameState,  +Level,  -Move)
 % chooses the best move for the hard bot, based on a scoring function
 choose_move([Board, white, hardBot-_, _-_, MaxLayer], hard, Move) :-
-  PossibleOrientations = [left, right, up, down],
   valid_moves([Board, _, _, _, MaxLayer], Moves),
   findall(Value-Move-Orientation, (
     member(Move, Moves), 
-    member(Orientation, PossibleOrientations), 
-    move([Board, white, hardBot-_, _-_, MaxLayer], Move, Orientation, NewGameState),
+    move([Board, white, hardBot-_, _-_, MaxLayer], Move-Orientation, NewGameState),
     value(NewGameState, white, Value)
   ), ScoredMoves),
   max_member(_-BestMove-BestOrientation, ScoredMoves),
