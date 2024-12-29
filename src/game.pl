@@ -13,18 +13,32 @@
 :- consult(menu).
 
 :- use_module(library(lists)).
+:- use_module(library(random)).
 
 default(empty-0).
 
-char(black,'b').
-char(white,'w').
+char(black,'B').
+char(white,'W').
 char(empty,'e').
 
 % play()
 % gives access to menu and starts game cycle
-play(GameState) :- 
+play :- 
   menu(GameConfig),
-  initial_state(GameConfig,GameState).
+  initial_state(GameConfig,GameState),
+  game_loop(GameState).
+
+% game_loop(+GameState)
+% loop of the main game
+game_loop(GameState) :-
+  GameState = [_,CurrentPlayer,_,_,_],
+  game_over(GameState,CurrentPlayer),
+  show_winner(CurrentPlayer), !.
+game_loop(GameState) :-
+  display_game(GameState),
+  choose_move(GameState,Move,Orientation),
+  move(GameState,Move,Orientation,NewGameState),
+  game_loop(NewGameState).
 
 % initial_state(+GameConfig, -GameState)
 % returns the initial game state giving a game configuration
@@ -64,6 +78,10 @@ move(GameState,X-Y,Orientation,NewGameState) :-
   get_piece(CurrentBoard,X-Y,_-Layer),
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
+
+check_valid_move(GameState,X-Y) :-
+  valid_moves(GameState,ValidMoves),
+  member(X-Y,ValidMoves).
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
@@ -118,14 +136,15 @@ result(0, draw).
 result(1, white).
 result(2, black).
 
-
 % game_over(+GameState, -Winner)
 % checks if the game is over in the current game state
 % case 1: one of the players win (kinda dfs)
 % case 2: one player loses all pieces (if the other player )
 % case 3: both players lose all pieces (draw)
-  
-
+game_over([Board,_,_,_,_],white) :-
+  check_winner(Board,white).
+game_over([Board,_,_,_,_],black) :-
+  check_winner(Board,black).
 
 % check_winner(+Board, -Winner)
 % checks if anyone has won the game in the current board
@@ -201,3 +220,59 @@ check_color(Board, X1-Y1, X2-Y2) :-
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
 % for human players, it interacts with the user to read the move
+/*
+choose_move([Board,white,hardBot-WhitePieces,BlackType-BlackPieces,MaxLayer],X-Y) :- .
+*/
+choose_move([Board,white,easyBot-_,_-_,MaxLayer],X-Y,Orientation) :- 
+  PossibleOrientations = [left,right,up,down],
+  valid_moves([Board,_,_,_,MaxLayer],Moves),
+  random_member(Orientation,PossibleOrientations),
+  random_member(X-Y, Moves).
+choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
+  nl,
+  write('White to move'), nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('--------------------'),nl,
+
+  valid_moves([Board,_,_,_,MaxLayer],Moves),
+  write(Moves), nl,
+
+  length(Board,N),
+  Max is N-1,
+  repeat,
+  write('X Coord:'),
+  get_input(0,Max,X),
+  write('Y Coord:'),
+  get_input(0,Max,Y),
+  get_orientation(Orientation),
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  !.
+/* 
+choose_move([Board,black,WhiteType-WhitePieces,hardBot-BlackPieces,MaxLayer],X-Y) :- .
+*/
+choose_move([Board,black,_-_,easyBot-_,MaxLayer],X-Y,Orientation) :- 
+  PossibleOrientations = [left,right,up,down],
+  valid_moves([Board,_,_,_,MaxLayer],Moves),
+  random_member(Orientation,PossibleOrientations),
+  random_member(X-Y, Moves).
+choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :- 
+  nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('Black to move'), nl,
+  write('--------------------'),nl,
+
+  valid_moves([Board,_,_,_,MaxLayer],Moves),
+  write(Moves), nl,
+
+  length(Board,N),
+  Max is N-1,
+  repeat,
+  write('X Coord:'),
+  get_input(0,Max,X),
+  write('Y Coord:'),
+  get_input(0,Max,Y),
+  get_orientation(Orientation),
+  check_valid_move([Board,_,_,_,MaxLayer],X-Y),
+  !.

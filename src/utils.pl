@@ -1,3 +1,9 @@
+between(Min, Max, Min):- Min =< Max.
+between(Min, Max, Value):-
+    Min < Max,
+    NextMin is Min + 1,
+    between(NextMin, Max, Value).
+
 % get_input(+Min,+Max,-Value)
 % gets an input value from user until the value is in range (Min,Max)
 get_input(Min,Max,Value) :-
@@ -49,13 +55,6 @@ gt(X,Y,Z) :- Z is max(X,Y) .
 plus_one(X-Y,NewX-NewY) :-
 	NewX is X+1,
 	NewY is Y+1.
-
-% maplist(+Predicate,+List,-Result)
-% Applies the Predicate to all elements of List
-maplist(_, [], []).
-maplist(Pred, [X|Xs], [Y|Ys]) :-
-    call(Pred, X, Y), 
-    maplist(Pred, Xs, Ys).
 
 % switch_player(+CurrentPlayer,-NewPlayer)
 % changes players

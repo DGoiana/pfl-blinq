@@ -20,7 +20,7 @@ create_board(Element, Size, Board):-
 % prints an element
 display_item(Item-Layer):- 
     char(Item, C), 
-    write(C-Layer), write(' ').
+    write(C), write(' ').
 
 % display_row(+List)
 % display a row of the board
@@ -73,5 +73,5 @@ place_square(LastBoard,XCoord-YCoord,Color,NewBoard) :-
   nth(XCoord,LastBoard,Line),
   nth(YCoord,Line,_-Layer),
   NewLayer is Layer+1,
-  replace(YCoord,Line,Color-NewLayer,NewLine),
-  replace(XCoord,LastBoard,NewLine,NewBoard).
+  replace(XCoord,Line,Color-NewLayer,NewLine),
+  replace(YCoord,LastBoard,NewLine,NewBoard).

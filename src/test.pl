@@ -52,3 +52,27 @@ test_valid_moves :-
   display_game(GameState),
   valid_moves(GameState,Moves),
 	write(Moves).
+
+test_choose_move :-
+  GameConfig = [5,player-player],
+  initial_state(GameConfig,GameState),
+  display_game(GameState),
+  choose_move(GameState,Move,Orientation),
+  move(GameState,Move,Orientation,NewGameState),
+  display_game(NewGameState).
+
+test_random_move :-
+  GameConfig = [5,easyBot-player],
+  initial_state(GameConfig,GameState),
+  % display_game(GameState),
+  choose_move(GameState,Move,Orientation),
+  move(GameState,Move,Orientation,[Board,_,_,_,_]),
+  display_board(Board), nl.
+  % move(GameState,Move,Orientation,NewGameState),
+  % display_game(NewGameState).
+
+test_batch :-
+  test_random_move,
+  test_random_move,
+  test_random_move,
+  test_random_move.

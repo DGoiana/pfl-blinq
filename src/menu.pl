@@ -23,6 +23,27 @@ get_type(1,GameType) :-
   get_level(BotLevel2),
   GameType = BotLevel1-BotLevel2.
 
+convert_orientation(1,left).
+convert_orientation(2,right).
+convert_orientation(3,up).
+convert_orientation(4,down).
+
+get_orientation(Orientation) :-
+  write('1- bw'), nl,
+  write('   bw'), nl,
+  nl,
+  write('2- wb'), nl,
+  write('   wb'), nl,
+  nl,
+  write('3- bb'), nl,
+  write('   ww'), nl,
+  nl,
+  write('4- ww'), nl,
+  write('   bb'), nl,
+  write('Orientation:'),
+  get_input(1,4,OrientationInput),
+  convert_orientation(OrientationInput,Orientation).
+
 % menu(-GameConfig)
 % prints menu and defines GameConfig
 menu([BoardSize,GameType]) :- 
