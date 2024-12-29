@@ -24,17 +24,42 @@ display_item(Item-Layer):-
 
 % display_row(+List)
 % display a row of the board
-display_row([]).
-display_row([Item|RemainingItems]):-
+display_row(Row) :-
+   display_row(Row,0).
+
+display_row([],_).
+display_row([Item|RemainingItems],CurrentElement):-
+    pair_vl(CurrentElement),
     display_item(Item),
-    display_row(RemainingItems).
+    NewCurrentElement is CurrentElement+1,
+    display_row(RemainingItems,NewCurrentElement).
+display_row([Item|RemainingItems],CurrentElement):-
+    \+ pair_vl(CurrentElement),
+    display_item(Item),
+    NewCurrentElement is CurrentElement+1,
+    display_row(RemainingItems,NewCurrentElement).
 
 % display_board(+Board)
 % display the whole board
-display_board([]).
-display_board([Row|RemainingRows]):-
-    display_row(Row), nl,
-    display_board(RemainingRows).
+display_board(Board) :-
+    length(Board,BoardSize),
+    NewBoardSize is BoardSize*3+1,
+    display_board(Board,NewBoardSize,0),
+    hl(NewBoardSize),nl.
+
+display_board([],_,_).
+display_board([Row|RemainingRows],BoardSize,CurrentLine):-
+    pair_hl(CurrentLine,BoardSize),
+    display_row(Row),
+    write('|'), nl,
+    NewCurrentLine is CurrentLine+1,
+    display_board(RemainingRows,BoardSize,NewCurrentLine).
+display_board([Row|RemainingRows],BoardSize,CurrentLine):-
+    \+ pair_hl(CurrentLine,BoardSize),
+    display_row(Row),
+    write('|'), nl,
+    NewCurrentLine is CurrentLine+1,
+    display_board(RemainingRows,BoardSize,NewCurrentLine).
 
 % left
 /* bw */
@@ -61,17 +86,18 @@ orientation(down,[white,white,black,black]).
 place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
   X1 is X+1,
   Y1 is Y+1,
-  orientation(Orientation,[C1,C2,C3,C4]),
+  orientation(Orientation,Colors),
+  Colors = [C1,C2,C3,C4],
   place_square(LastBoard,X-Y,C1,NextBoard),
-  place_square(NextBoard,X-Y1,C2,NextNextBoard),
-  place_square(NextNextBoard,X1-Y,C3,NextNextNextBoard),
+  place_square(NextBoard,X1-Y,C2,NextNextBoard),
+  place_square(NextNextBoard,X-Y1,C3,NextNextNextBoard),
   place_square(NextNextNextBoard,X1-Y1,C4,NewBoard).
 
 % place_square(+LastBoard,+Coords,+NewValue,-NewBoard)
 % places a value in a square on the board
 place_square(LastBoard,XCoord-YCoord,Color,NewBoard) :-
-  nth(XCoord,LastBoard,Line),
-  nth(YCoord,Line,_-Layer),
+  nth(YCoord,LastBoard,Line),
+  nth(XCoord,Line,_-Layer),
   NewLayer is Layer+1,
   replace(XCoord,Line,Color-NewLayer,NewLine),
   replace(YCoord,LastBoard,NewLine,NewBoard).

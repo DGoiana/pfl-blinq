@@ -1,5 +1,10 @@
 :- consult(game).
 
+test_board :-
+  GameConfig = [5,player-player],
+  initial_state(GameConfig,GameState),
+  display_game(GameState).
+
 % test_place()
 % tests piece placement
 test_place :-
@@ -20,14 +25,16 @@ test_place :-
   display_board(NewBoardDown).
 
 test_move :-
-  menu(GameConfig),
+  GameConfig = [5,player-player],
   initial_state(GameConfig,GameState),
   display_game(GameState),
-  move(GameState,1-1,left,NewGameState),
+  move(GameState,2-2,down,NewGameState),
+  display_game(NewGameState).
+/* 
   display_game(NewGameState),
-  move(NewGameState,1-1,left,NewGameState2),
+  move(NewGameState,4-2,left,NewGameState2),
   display_game(NewGameState2).
-
+ */
 test_plataform :-
   GameConfig = [5,player-player],
   initial_state(GameConfig,GameState),

@@ -67,3 +67,24 @@ change_pieces(white,CurrentWhitePieces,CurrentBlackPieces,NewWhitePieces,Current
   NewWhitePieces is CurrentWhitePieces-1.
 change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,NewBlackPieces) :-
   NewBlackPieces is CurrentBlackPieces-1.
+
+% hl(+BoardSize)
+% displays a horizontal line of size BoardSize
+hl(0).
+hl(BoardSize) :-
+    BoardSize > 0,
+    write('-'),
+    NewBoardSize is BoardSize-1,
+    hl(NewBoardSize).
+
+% pair_hl(+CurrentLine,+BoardSize)
+% displays a horizontal line of size BoardSize if CurrentLine is even
+pair_hl(CurrentLine,BoardSize) :-
+    CurrentLine mod 2 =:= 0,
+    hl(BoardSize),nl.
+
+% pair_vl(+CurrentLine,+BoardSize)
+% displays a vertical line of size BoardSize if CurrentElement is even
+pair_vl(CurrentElement) :-
+    CurrentElement mod 2 =:= 0,
+    write('| ').

@@ -63,7 +63,6 @@ display_game(GameState) :-
     format('Black Type : ~s',PlayerTypeBlack), nl,
     format('Black Pieces: ~d',PiecesBlack), nl,
     format('Max Layer: ~d',MaxLayer), nl,
-    write('--------------------'), nl,
 
     display_board(CurrentBoard).
 
@@ -75,7 +74,7 @@ move(GameState,X-Y,Orientation,NewGameState) :-
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
   switch_player(CurrentPlayer,NewPlayer),
-  get_piece(CurrentBoard,X-Y,_-Layer),
+  get_piece(NewBoard,X-Y,Color-Layer),
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
@@ -229,6 +228,7 @@ choose_move([Board,white,easyBot-_,_-_,MaxLayer],X-Y,Orientation) :-
   random_member(Orientation,PossibleOrientations),
   random_member(X-Y, Moves).
 choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
+  /* TODO: Convert to convention: (1,1) at bottom left corner */
   nl,
   write('White to move'), nl,
   write('Blinq'),nl,
@@ -257,6 +257,7 @@ choose_move([Board,black,_-_,easyBot-_,MaxLayer],X-Y,Orientation) :-
   random_member(Orientation,PossibleOrientations),
   random_member(X-Y, Moves).
 choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :- 
+  /* TODO: Convert to convention: (1,1) at bottom left corner */
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
