@@ -70,9 +70,9 @@ display_game(GameState) :-
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
-move(GameState,X-Y,Orientation,NewGameState) :-
+move(GameState,X-Y, Orientation,NewGameState) :-
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
-  place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
+  place_piece(CurrentBoard,X-Y, Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
   switch_player(CurrentPlayer,NewPlayer),
   get_piece(CurrentBoard,X-Y,_-Layer),
@@ -96,29 +96,29 @@ valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
     is_empty(Board, X-Y)
   ),EmptyMoves),
 	NewMaxLayer is MaxLayer+1,
-	get_plataforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
+	get_platforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
 	append(EmptyMoves,PlatformMoves,ListOfMoves).
 
-% get_plataforms(+Board,+BoardSize,+Layer,-Moves)
-% gets all availables moves atop 2x2 plataforms from MaxLayer to 1.
-get_plataforms(_,_,1,[]).
-get_plataforms(Board,BoardSize,Layer,Moves) :-
+% get_platforms(+Board,+BoardSize,+Layer,-Moves)
+% gets all availables moves atop 2x2 platforms from MaxLayer to 1.
+get_platforms(_,_,1,[]).
+get_platforms(Board,BoardSize,Layer,Moves) :-
 	Layer > 1,
 	NewLayer is Layer-1,
-	get_plataforms(Board,BoardSize,NewLayer,NewMoves),
+	get_platforms(Board,BoardSize,NewLayer,NewMoves),
 	get_layer_plataform(Board,BoardSize,NewLayer,Result),
 	append(NewMoves,Result,Moves).
 
 % get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
-% gets all available moves atop 2x2 plataforms in a given layer
+% gets all available moves atop 2x2 platforms in a given layer
 get_layer_plataform(Board,BoardSize,Layer,Moves) :-
   findall(X-Y, (
     between(0, BoardSize, X), X mod 2 =:= 0,
     between(0, BoardSize, Y), Y mod 2 =:= 0,
 		get_piece(Board,X-Y,_-Layer),
     check_plataform(Board, X-Y,Layer)
-  ),Plataforms),
-	maplist(plus_one,Plataforms,Moves).
+  ),Platforms),
+	maplist(plus_one,Platforms,Moves).
 
 % check_plataform(+Board,+Coords,+Layer)
 % determines if there is a plataform starting on Coords
@@ -212,10 +212,29 @@ check_color(Board, X1-Y1, X2-Y2) :-
   nth0(X2, Board, Row2),
   nth0(Y2, Row2, Color2-_),
   Color1 = Color2.
-  
 
 % value(+GameState, +Player, -Value)
 % returns how good/bad is the current game state to player
+% currently sees the minimum distance of a piece to the finish line
+value([Board, _, _, _, _], white, Value) :-
+  findall(Distance, (
+    nth0(X, Board, Row),
+    nth0(Y, Row, white-_),
+    length(Board, Size),
+    Distance is Size - 1 - X
+    ), Distances),
+    min_list(Distances, MinDistance),
+    Value is 100 - MinDistance. % 100 is the max size??
+
+value([Board, _, _, _, _], black, Value) :-
+  findall(Distance, (
+    nth0(X, Board, Row),
+    nth0(Y, Row, black-_),
+    length(Board, Size),
+    Distance is Size - 1 - Y
+  ), Distances),
+  min_list(Distances, MinDistance),
+  Value is 100 - MinDistance. % 100 is the max size?? 
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
@@ -276,3 +295,17 @@ choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :-
   get_orientation(Orientation),
   check_valid_move([Board,_,_,_,MaxLayer],X-Y),
   !.
+
+% choose_move(+GameState,  +Level,  -Move)
+% chooses the best move for the hard bot, based on a scoring function
+choose_move([Board, white, hardBot-_, _-_, MaxLayer], hard, Move) :-
+  PossibleOrientations = [left, right, up, down],
+  valid_moves([Board, _, _, _, MaxLayer], Moves),
+  findall(Value-Move-Orientation, (
+    member(Move, Moves), 
+    member(Orientation, PossibleOrientations), 
+    move([Board, white, hardBot-_, _-_, MaxLayer], Move, Orientation, NewGameState),
+    value(NewGameState, white, Value)
+  ), ScoredMoves),
+  max_member(_-BestMove-BestOrientation, ScoredMoves),
+  Move = BestMove-BestOrientation.
