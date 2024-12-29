@@ -95,6 +95,11 @@ orientation(up,[black,black,white,white]).
 /* bb */
 orientation(down,[white,white,black,black]).
 
+% neutral
+/* wb */
+/* bw */
+orientation(neutral,[white,black,black,white]).
+
 % place_piece(+LastBoard,+Coords,+Orientation,-NewBoard)
 % puts a given piece (based on its orientation) in the board
 place_piece(LastBoard,X-Y,Orientation,NewBoard) :-

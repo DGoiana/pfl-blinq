@@ -139,3 +139,7 @@ show_winner(white) :-
   write('--------------------'),nl,
   write('White Won'),
   write('--------------------'),nl.
+
+get_middle(BoardSize,X-Y) :-
+  X is BoardSize // 2 - 1,
+  Y is BoardSize // 2 - 1.

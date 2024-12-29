@@ -14,7 +14,10 @@ get_level(Level) :-
 
 % get_type(+TypeInput,-GameType)
 % gets the game type
-get_type(3,player-player).
+get_type(4,player-player).
+get_type(3,GameType) :-
+  get_level(BotLevel),
+  GameType = player-bot.
 get_type(2,GameType) :-
   get_level(BotLevel),
   GameType = BotLevel-player.
@@ -56,9 +59,9 @@ get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
   Max is BoardSize-1,
   repeat,
   write('X Coord:'),
-  get_input(0,Max,XInput),
+  get_input(0,BoardSize,XInput),
   write('Y Coord:'),
-  get_input(0,Max,YInput),
+  get_input(0,BoardSize,YInput),
   get_orientation(Orientation),
   convert_coords(XInput-YInput,BoardSize,X-Y),
   write(X-Y-Orientation),nl,
@@ -70,12 +73,14 @@ get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
 % prints menu and defines GameConfig
 menu([BoardSize,GameType]) :- 
   write('Blinq'), nl,
-  write('Board Size:'),
+  write('Board Size (1-10): '),
   get_input(1,10,BoardSize),
   write('Game Type'), nl,
+  write('(White-Black)'),nl,
   write('1- Bot-Bot'), nl,
   write('2- Bot-Player'), nl,
-  write('3- Player-Player'), nl,
+  write('3- Player-Bot'), nl,
+  write('4- Player-Player'), nl,
   write('Type:'),
-  get_input(1,3,Type),
+  get_input(1,4,Type),
   get_type(Type,GameType).

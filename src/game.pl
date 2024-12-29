@@ -47,8 +47,10 @@ initial_state(GameConfig, GameState) :-
   GameConfig = [GameSize, PType1-PType2],
   BoardSize is GameSize*2, % each square needs to be 2x2 
   create_board(Element, BoardSize, CurrentBoard),
+  get_middle(BoardSize,X-Y),
+  place_piece(CurrentBoard,X-Y,neutral,NewBoard),
   get_pieces(GameSize,StartPieces),
-  GameState = [CurrentBoard, white, PType1-StartPieces, PType2-StartPieces,0].
+  GameState = [NewBoard, white, PType1-StartPieces, PType2-StartPieces,0].
 
 % display_game(+GameState)
 % prints the game state to the terminal
