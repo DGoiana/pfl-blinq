@@ -30,16 +30,13 @@ play :-
 
 % game_loop(+GameState)
 % loop of the main game
-/*game_loop(GameState) :-
+game_loop(GameState) :-
   GameState = [_,CurrentPlayer,_,_,_],
   game_over(GameState,CurrentPlayer),
-  show_winner(CurrentPlayer), !.*/
-
+  show_winner(CurrentPlayer), !.
 game_loop(GameState) :-
   display_game(GameState),
-  write('teste'),
   choose_move(GameState, _, Move),
-  write('teste2'),
   move(GameState,Move,NewGameState),
   game_loop(NewGameState).
 
@@ -66,6 +63,8 @@ display_game(GameState) :-
     format('Black Type : ~s',PlayerTypeBlack), nl,
     format('Black Pieces: ~d',PiecesBlack), nl,
     format('Max Layer: ~d',MaxLayer), nl,
+    write('--------------------'),nl,
+    nl,
 
     display_board(CurrentBoard).
 

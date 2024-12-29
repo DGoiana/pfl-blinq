@@ -45,9 +45,10 @@ display_board(Board) :-
     length(Board,BoardSize),
     NewBoardSize is BoardSize*3+1,
     number_line(BoardSize), nl,
-    write('y'),nl,
+    write('y   '),hl(NewBoardSize,'W'),nl,
     display_board(Board,NewBoardSize,0),
-    write('  '),hl(NewBoardSize),nl.
+    write('   B'),hl(NewBoardSize,'-'),write('B'),nl,
+    write('    '),hl(NewBoardSize,'W'),nl.
 
 write_number(N) :-
     N < 10,
@@ -61,17 +62,17 @@ display_board([Row|RemainingRows],BoardSize,CurrentLine):-
     pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine),
+    write_number(DisplayCurrentLine), write(' '),write('B'),
     display_row(Row),
-    write('|'), nl,
+    write('|'), write(''),write('B'), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine).
 display_board([Row|RemainingRows],BoardSize,CurrentLine):-
     \+ pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine),
+    write_number(DisplayCurrentLine), write(' '),write('B'),
     display_row(Row),
-    write('|'), nl,
+    write('|'), write(''),write('B'), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine).
 
 % left

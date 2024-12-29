@@ -70,19 +70,19 @@ change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,New
 
 % hl(+BoardSize)
 % displays a horizontal line of size BoardSize
-hl(0).
-hl(BoardSize) :-
+hl(0,_).
+hl(BoardSize,Symbol) :-
     BoardSize > 0,
-    write('-'),
+    write(Symbol),
     NewBoardSize is BoardSize-1,
-    hl(NewBoardSize).
+    hl(NewBoardSize,Symbol).
 
 % pair_hl(+CurrentLine,+BoardSize)
 % displays a horizontal line of size BoardSize if CurrentLine is even
 pair_hl(CurrentLine,BoardSize) :-
     CurrentLine mod 2 =:= 0,
-    write('  '),
-    hl(BoardSize),nl.
+    write('   B'),
+    hl(BoardSize,'-'),write('B'),nl.
 
 % pair_vl(+CurrentLine,+BoardSize)
 % displays a vertical line of size BoardSize if CurrentElement is even
@@ -95,7 +95,7 @@ convert_coords(X-Y,BoardSize,NewX-NewY) :-
   NewX is X-1.
 
 number_line(N) :-
-  write('x '),
+  write('  x '),
   number_line(N,N),
   write('|').
 number_line(0,_).

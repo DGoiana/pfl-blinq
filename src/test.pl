@@ -1,9 +1,9 @@
 :- consult(game).
 
-test_board :-
-  GameConfig = [5,player-player],
+test_board(Size) :-
+  GameConfig = [Size,player-player],
   initial_state(GameConfig,GameState),
-  display_game(GameState).
+  display_game(GameState), !.
 
 % test_place()
 % tests piece placement
@@ -72,10 +72,8 @@ test_choose_move :-
 test_random_move :-
   GameConfig = [5,easyBot-player],
   initial_state(GameConfig,GameState),
-  % display_game(GameState),
   choose_move(GameState,_,Move),
   move(GameState,Move,NewGameState),
-  % move(GameState,Move,Orientation,NewGameState),
   display_game(NewGameState),!.
 
 test_batch :-
