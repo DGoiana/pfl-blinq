@@ -30,14 +30,17 @@ play :-
 
 % game_loop(+GameState)
 % loop of the main game
-game_loop(GameState) :-
+/*game_loop(GameState) :-
   GameState = [_,CurrentPlayer,_,_,_],
   game_over(GameState,CurrentPlayer),
-  show_winner(CurrentPlayer), !.
+  show_winner(CurrentPlayer), !.*/
+
 game_loop(GameState) :-
   display_game(GameState),
-  choose_move(GameState,Move,Orientation),
-  move(GameState,Move,Orientation,NewGameState),
+  write('teste'),
+  choose_move(GameState, _, Move),
+  write('teste2'),
+  move(GameState,Move,NewGameState),
   game_loop(NewGameState).
 
 % initial_state(+GameConfig, -GameState)
@@ -69,7 +72,7 @@ display_game(GameState) :-
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
-move(GameState,X-Y,Orientation,NewGameState) :-
+move(GameState,X-Y-Orientation,NewGameState) :-
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
@@ -78,9 +81,9 @@ move(GameState,X-Y,Orientation,NewGameState) :-
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
-check_valid_move(GameState,X-Y) :-
+check_valid_move(GameState,X-Y-_) :-
   valid_moves(GameState,ValidMoves),
-  member(X-Y,ValidMoves).
+  member(X-Y-_,ValidMoves).
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
@@ -89,35 +92,37 @@ check_valid_move(GameState,X-Y) :-
 valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
   length(Board,BoardLength),
   Max is BoardLength-2,
-  findall(X-Y, (
+  findall(X-Y-Orientation, (
     between(0, Max, X), X mod 2 =:= 0,
     between(0, Max, Y), Y mod 2 =:= 0,
-    is_empty(Board, X-Y)
+    is_empty(Board, X-Y),
+    member(Orientation, [left, right, up, down])
   ),EmptyMoves),
 	NewMaxLayer is MaxLayer+1,
-	get_plataforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
+	get_platforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
 	append(EmptyMoves,PlatformMoves,ListOfMoves).
 
-% get_plataforms(+Board,+BoardSize,+Layer,-Moves)
-% gets all availables moves atop 2x2 plataforms from MaxLayer to 1.
-get_plataforms(_,_,1,[]).
-get_plataforms(Board,BoardSize,Layer,Moves) :-
+% get_platforms(+Board,+BoardSize,+Layer,-Moves)
+% gets all availables moves atop 2x2 platforms from MaxLayer to 1.
+get_platforms(_,_,1,[]).
+get_platforms(Board,BoardSize,Layer,Moves) :-
 	Layer > 1,
 	NewLayer is Layer-1,
-	get_plataforms(Board,BoardSize,NewLayer,NewMoves),
+	get_platforms(Board,BoardSize,NewLayer,NewMoves),
 	get_layer_plataform(Board,BoardSize,NewLayer,Result),
 	append(NewMoves,Result,Moves).
 
 % get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
-% gets all available moves atop 2x2 plataforms in a given layer
+% gets all available moves atop 2x2 platforms in a given layer
 get_layer_plataform(Board,BoardSize,Layer,Moves) :-
-  findall(X-Y, (
+  findall(X-Y-Orientation, (
     between(0, BoardSize, X), X mod 2 =:= 0,
     between(0, BoardSize, Y), Y mod 2 =:= 0,
 		get_piece(Board,X-Y,_-Layer),
-    check_plataform(Board, X-Y,Layer)
-  ),Plataforms),
-	maplist(plus_one,Plataforms,Moves).
+    check_plataform(Board, X-Y,Layer),
+    member(Orientation, [left, right, up, down])
+  ),Platforms),
+	maplist(plus_one,Platforms,Moves).
 
 % check_plataform(+Board,+Coords,+Layer)
 % determines if there is a plataform starting on Coords
@@ -211,10 +216,29 @@ check_color(Board, X1-Y1, X2-Y2) :-
   nth0(X2, Board, Row2),
   nth0(Y2, Row2, Color2-_),
   Color1 = Color2.
-  
 
 % value(+GameState, +Player, -Value)
 % returns how good/bad is the current game state to player
+% currently sees the minimum distance of a piece to the finish line
+value([Board, _, _, _, _], white, Value) :-
+  findall(Distance, (
+    nth0(X, Board, Row),
+    nth0(Y, Row, white-_),
+    length(Board, Size),
+    Distance is Size - 1 - X
+    ), Distances),
+    min_list(Distances, MinDistance),
+    Value is 100 - MinDistance. % 100 is the max size??
+
+value([Board, _, _, _, _], black, Value) :-
+  findall(Distance, (
+    nth0(X, Board, Row),
+    nth0(Y, Row, black-_),
+    length(Board, Size),
+    Distance is Size - 1 - Y
+  ), Distances),
+  min_list(Distances, MinDistance),
+  Value is 100 - MinDistance. % 100 is the max size?? 
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
@@ -222,12 +246,13 @@ check_color(Board, X1-Y1, X2-Y2) :-
 /*
 choose_move([Board,white,hardBot-WhitePieces,BlackType-BlackPieces,MaxLayer],X-Y) :- .
 */
-choose_move([Board,white,easyBot-_,_-_,MaxLayer],X-Y,Orientation) :- 
-  PossibleOrientations = [left,right,up,down],
+choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :- 
+  write('wtf'),
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  random_member(Orientation,PossibleOrientations),
-  random_member(X-Y, Moves).
-choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
+  write(Moves),
+  random_member(X-Y-Orientation, Moves),
+  write('wtf3').
+choose_move([Board,white,player-_,_-_,MaxLayer], _ , X-Y-Orientation) :-
   nl,
   write('White to move'), nl,
   write('Blinq'),nl,
@@ -238,12 +263,10 @@ choose_move([Board,white,player-_,_-_,MaxLayer],X-Y,Orientation) :-
 /* 
 choose_move([Board,black,WhiteType-WhitePieces,hardBot-BlackPieces,MaxLayer],X-Y) :- .
 */
-choose_move([Board,black,_-_,easyBot-_,MaxLayer],X-Y,Orientation) :- 
-  PossibleOrientations = [left,right,up,down],
+choose_move([Board,black,_-_,easyBot-_,MaxLayer], _ , X-Y-Orientation) :- 
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  random_member(Orientation,PossibleOrientations),
-  random_member(X-Y, Moves).
-choose_move([Board,black,_-_,player-_,MaxLayer],X-Y,Orientation) :- 
+  random_member(X-Y-Orientation, Moves).
+choose_move([Board,black,_-_,player-_,MaxLayer], _ , X-Y-Orientation) :- 
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
