@@ -18,7 +18,7 @@ create_board(Element, Size, Board):-
 
 % display_item(+Item)
 % prints an element
-display_item(Item-Layer):- 
+display_item(Item-_):- 
     char(Item, C), 
     write(C), write(' ').
 

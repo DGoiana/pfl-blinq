@@ -17,7 +17,7 @@ get_level(Level) :-
 get_type(4,player-player).
 get_type(3,GameType) :-
   get_level(BotLevel),
-  GameType = player-bot.
+  GameType = player-BotLevel.
 get_type(2,GameType) :-
   get_level(BotLevel),
   GameType = BotLevel-player.
@@ -56,7 +56,6 @@ get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
   write(Moves), nl,
 
   length(Board,BoardSize),
-  Max is BoardSize-1,
   repeat,
   write('X Coord:'),
   get_input(0,BoardSize,XInput),

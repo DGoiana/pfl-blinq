@@ -1,5 +1,9 @@
 :- consult(game).
 
+test_board :-
+  GameConfig = [5,player-player],
+  initial_state(GameConfig,GameState),
+  display_game(GameState), !.
 test_board(Size) :-
   GameConfig = [Size,player-player],
   initial_state(GameConfig,GameState),

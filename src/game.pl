@@ -76,19 +76,12 @@ display_game(GameState) :-
 move(GameState,X-Y-Orientation,NewGameState) :-
   write(GameState),
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
-  write('wtd2'),
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
-  write('wtd2'),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
-  write('wtd2'),
   switch_player(CurrentPlayer,NewPlayer),
-  write('wtd2'),
   get_piece(NewBoard,X-Y,_-Layer),
-  write('wtd2'),
   gt(Layer,MaxLayer,NewMaxLayer),
-  write('wtd2'),
-  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer],
-  write('wtd2').
+  NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
 check_valid_move(GameState,X-Y-_) :-
   valid_moves(GameState,ValidMoves),
@@ -229,11 +222,6 @@ check_color(Board, X1-Y1, X2-Y2) :-
 % value(+GameState, +Player, -Value)
 % returns how good/bad is the current game state to player
 % currently sees the minimum distance of a piece to the finish line
-value([Board, _, _, _, _], white, Value) :-
-  
-
-value([Board, _, _, _, _], black, Value) :-
-  
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
