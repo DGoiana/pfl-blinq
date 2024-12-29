@@ -126,10 +126,16 @@ number_line(N,Max) :-
   Current2 is Max-N2,
   format('| ~d ~d ',[Current,Current2]),
   number_line(N2,Max).
-/* number_line(N,Max) :-
-  N > 0,
-  N1 is N-1, 
-  Current is Max-N1,
-  Current >= 10,
-  format('|~d',Current ),
-  number_line(N1,Max). */
+
+show_winner(black) :-
+  nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('Black Won'),
+  write('--------------------'),nl.
+show_winner(white) :-
+  nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('White Won'),
+  write('--------------------'),nl.

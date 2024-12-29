@@ -256,11 +256,8 @@ choose_move([Board, white, hardBot-_, _-_, MaxLayer], hard, Move) :-
   Move = BestMove-BestOrientation.
 
 choose_move([Board,white,easyBot-_,_-_,MaxLayer], _ , X-Y-Orientation) :- 
-  write('wtf'),
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  write(Moves),
-  random_member(X-Y-Orientation, Moves),
-  write('wtf3').
+  random_member(X-Y-Orientation, Moves).
 choose_move([Board,white,player-_,_-_,MaxLayer], _ , X-Y-Orientation) :-
   nl,
   write('Blinq'),nl,
