@@ -29,11 +29,11 @@ big_char(empty,'E').
 display_item(Item-Layer,X-Y,ValidMoves):- 
     \+ member(Y-X-_,ValidMoves),
     char(Item, C), 
-    write(C-Layer), write(' ').
+    write(C), write(' ').
 display_item(Item-Layer,X-Y,ValidMoves):- 
     member(Y-X-_,ValidMoves),
     big_char(Item, C), 
-    write(C-Layer), write(' ').
+    write(C), write(' ').
 
 % display_row(+List)
 % display a row of the board

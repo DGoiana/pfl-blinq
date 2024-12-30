@@ -30,7 +30,7 @@ play :-
 game_loop([Board,_,_-0,_-_,_]) :-
   show_winner(draw),
   display_board(Board,[]), !.
-game_loop([_,_,_-_,_-0,_]) :-
+game_loop([Board,_,_-_,_-0,_]) :-
   show_winner(draw),
   display_board(Board,[]), !.
 game_loop(GameState) :-
@@ -87,8 +87,7 @@ move(GameState,X-Y-Orientation,NewGameState) :-
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer].
 
-check_valid_move(GameState,X-Y-_) :-
-  valid_moves(GameState,ValidMoves),
+check_valid_move(X-Y-_,ValidMoves) :-
   member(X-Y-_,ValidMoves).
 
 % valid_moves(+GameState, -ListOfMoves)
@@ -97,7 +96,6 @@ check_valid_move(GameState,X-Y-_) :-
 % case 2: there is 2x2 plataform with the same Layer
 valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
   length(Board,BoardLength),
-  Max is BoardLength-2, % pieces are 2x2
 	NewMaxLayer is MaxLayer+1,
 	get_platforms(Board,BoardLength,NewMaxLayer,ListOfMoves).
   
@@ -291,25 +289,25 @@ sequence_length(Board, X-Y, Player, Visited, Length) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-sequence_score(Board, X-Y, white, Score) :-
+sequence_score(Board, X-_, white, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   X < HalfSize,
   Score is -X.
 
-sequence_score(Board, X-Y, white, Score) :-
+sequence_score(Board, X-_, white, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   X >= HalfSize,
   Score is -(Size - X).
 
-sequence_score(Board, X-Y, black, Score) :-
+sequence_score(Board, _-Y, black, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   Y < HalfSize,
   Score is -Y.
 
-sequence_score(Board, X-Y, black, Score) :-
+sequence_score(Board, _-Y, black, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   Y >= HalfSize,
