@@ -53,7 +53,6 @@ get_orientation(Orientation) :-
 % gets the desired move from the user
 get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
   valid_moves([Board,_,_,_,MaxLayer],Moves),
-  write(Moves), nl,
 
   length(Board,BoardSize),
   repeat,
