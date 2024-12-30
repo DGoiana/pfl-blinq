@@ -72,8 +72,8 @@ get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
 % prints menu and defines GameConfig
 menu([BoardSize,GameType]) :- 
   write('Blinq'), nl,
-  write('Board Size (1-10): '),
-  get_input(1,10,BoardSize),
+  write('Board Size (3-10): '),
+  get_input(3,10,BoardSize),
   write('Game Type'), nl,
   write('(White-Black)'),nl,
   write('1- Bot-Bot'), nl,

@@ -16,64 +16,68 @@ create_board(Element, Size, Board):-
 
 % DISPLAY BOARD
 
+char(black,'b').
+char(white,'w').
+char(empty,'e').
+
+big_char(black,'B').
+big_char(white,'W').
+big_char(empty,'E').
+
 % display_item(+Item)
 % prints an element
-display_item(Item-_):- 
+display_item(Item-Layer,X-Y,ValidMoves):- 
+    \+ member(Y-X-_,ValidMoves),
     char(Item, C), 
-    write(C), write(' ').
+    write(C-Layer), write(' ').
+display_item(Item-Layer,X-Y,ValidMoves):- 
+    member(Y-X-_,ValidMoves),
+    big_char(Item, C), 
+    write(C-Layer), write(' ').
 
 % display_row(+List)
 % display a row of the board
-display_row(Row) :-
-   display_row(Row,0).
-
-display_row([],_).
-display_row([Item|RemainingItems],CurrentElement):-
+display_row(Row,CurrentLine,ValidMoves) :-
+   display_row(Row,0,CurrentLine,ValidMoves).
+display_row([],_,_,_).
+display_row([Item|RemainingItems],CurrentElement,CurrentLine,ValidMoves):-
     pair_vl(CurrentElement),
-    display_item(Item),
+    display_item(Item,CurrentLine-CurrentElement,ValidMoves),
     NewCurrentElement is CurrentElement+1,
-    display_row(RemainingItems,NewCurrentElement).
-display_row([Item|RemainingItems],CurrentElement):-
+    display_row(RemainingItems,NewCurrentElement,CurrentLine,ValidMoves).
+display_row([Item|RemainingItems],CurrentElement,CurrentLine,ValidMoves):-
     \+ pair_vl(CurrentElement),
-    display_item(Item),
+    display_item(Item,CurrentLine-CurrentElement,ValidMoves),
     NewCurrentElement is CurrentElement+1,
-    display_row(RemainingItems,NewCurrentElement).
+    display_row(RemainingItems,NewCurrentElement,CurrentLine,ValidMoves).
 
 % display_board(+Board)
 % display the whole board
-display_board(Board) :-
+display_board(Board,ValidMoves) :-
     length(Board,BoardSize),
     NewBoardSize is BoardSize*3+1,
     number_line(BoardSize), nl,
     write('y   '),hl(NewBoardSize,'W'),nl,
-    display_board(Board,NewBoardSize,0),
+    display_board(Board,NewBoardSize,0,ValidMoves),
     write('   B'),hl(NewBoardSize,'-'),write('B'),nl,
     write('    '),hl(NewBoardSize,'W'),nl.
-
-write_number(N) :-
-    N < 10,
-    write(N),write(' ').
-write_number(N) :-
-    N >= 10,
-    write(N).
-
-display_board([],_,_).
-display_board([Row|RemainingRows],BoardSize,CurrentLine):-
+display_board([],_,_,_).
+display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
     write_number(DisplayCurrentLine), write(' '),write('B'),
-    display_row(Row),
+    display_row(Row,CurrentLine,ValidMoves),
     write('|'), write(''),write('B'), nl,
-    display_board(RemainingRows,BoardSize,NewCurrentLine).
-display_board([Row|RemainingRows],BoardSize,CurrentLine):-
+    display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
+display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     \+ pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
     write_number(DisplayCurrentLine), write(' '),write('B'),
-    display_row(Row),
+    display_row(Row,CurrentLine,ValidMoves),
     write('|'), write(''),write('B'), nl,
-    display_board(RemainingRows,BoardSize,NewCurrentLine).
+    display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
 
 % left
 /* bw */

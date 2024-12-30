@@ -13,11 +13,17 @@ get_input(Min,Max,Value) :-
   between(Min,Max,Value), !.
 
 % get_pieces(+BoardSize,-Pieces)
-% get number of starting pieces from BoardSize
-get_pieces(5,27).
+% get number of starting pieces for each player from BoardSize
 get_pieces(BoardSize,Pieces) :-
-  BoardSize =\= 5,
-  Pieces is BoardSize * 5.
+  calculate_pieces(BoardSize,TotalPieces),
+  Pieces is round(TotalPieces) // 2.
+
+calculate_pieces(0,0).
+calculate_pieces(N,Sum) :-
+  N > 0,
+  NewN is N-1,
+  calculate_pieces(NewN,Result),
+  Sum is Result+(N**2).
 
 % replace(+Index,+List,+Value,-NewList)
 % replaces a list element with another
@@ -49,12 +55,6 @@ is_empty(Board,X-Y) :-
 % gt(+X,+Y,-Z)
 % returns the maximum between two values
 gt(X,Y,Z) :- Z is max(X,Y) .
-
-% plus_one(+Coords,-NewCoords)
-% adds an offset of 1 to coordinates
-plus_one(X-Y-_,NewX-NewY-_) :-
-	NewX is X+1,
-	NewY is Y+1.
 
 % switch_player(+CurrentPlayer,-NewPlayer)
 % changes players
@@ -133,15 +133,28 @@ show_winner(black) :-
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
-  write('Black Won'),
+  write('Black Won'), nl,
   write('--------------------'),nl.
 show_winner(white) :-
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
-  write('White Won'),
+  write('White Won'), nl,
+  write('--------------------'),nl.
+show_winner(draw) :-
+  nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('Draw'), nl,
   write('--------------------'),nl.
 
 get_middle(BoardSize,X-Y) :-
   X is BoardSize // 2 - 1,
   Y is BoardSize // 2 - 1.
+
+write_number(N) :-
+    N < 10,
+    write(N),write(' ').
+write_number(N) :-
+    N >= 10,
+    write(N).

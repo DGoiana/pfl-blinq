@@ -17,9 +17,6 @@
 
 default(empty-0).
 
-char(black,'B').
-char(white,'W').
-char(empty,'e').
 
 % play()
 % gives access to menu and starts game cycle
@@ -30,10 +27,17 @@ play :-
 
 % game_loop(+GameState)
 % loop of the main game
+game_loop([Board,_,_-0,_-_,_]) :-
+  show_winner(draw),
+  display_board(Board,[]), !.
+game_loop([_,_,_-_,_-0,_]) :-
+  show_winner(draw),
+  display_board(Board,[]), !.
 game_loop(GameState) :-
-  GameState = [_,CurrentPlayer,_,_,_],
+  GameState = [Board,CurrentPlayer,_,_,_],
   game_over(GameState,CurrentPlayer),
-  show_winner(CurrentPlayer), !.
+  show_winner(CurrentPlayer),
+  display_board(Board,[]), !.
 game_loop(GameState) :-
   display_game(GameState),
   choose_move(GameState, _, Move),
@@ -68,13 +72,13 @@ display_game(GameState) :-
     write('--------------------'),nl,
     nl,
 
-    display_board(CurrentBoard).
+    valid_moves(GameState,ValidMoves),
+    display_board(CurrentBoard,ValidMoves).
 
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
 move(GameState,X-Y-Orientation,NewGameState) :-
-  write(GameState),
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer],
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
@@ -93,22 +97,15 @@ check_valid_move(GameState,X-Y-_) :-
 % case 2: there is 2x2 plataform with the same Layer
 valid_moves([Board,_,_,_,MaxLayer],ListOfMoves) :-
   length(Board,BoardLength),
-  Max is BoardLength-2,
-  findall(X-Y-Orientation, (
-    between(0, Max, X), X mod 2 =:= 0,
-    between(0, Max, Y), Y mod 2 =:= 0,
-    is_empty(Board, X-Y),
-    member(Orientation, [left, right, up, down])
-  ),EmptyMoves),
+  Max is BoardLength-2, % pieces are 2x2
 	NewMaxLayer is MaxLayer+1,
-	get_platforms(Board,BoardLength,NewMaxLayer,PlatformMoves),
-	append(EmptyMoves,PlatformMoves,ListOfMoves).
-
+	get_platforms(Board,BoardLength,NewMaxLayer,ListOfMoves).
+  
 % get_platforms(+Board,+BoardSize,+Layer,-Moves)
 % gets all availables moves atop 2x2 platforms from MaxLayer to 1.
-get_platforms(_,_,1,[]).
+get_platforms(_,_,0,[]).
 get_platforms(Board,BoardSize,Layer,Moves) :-
-	Layer > 1,
+	Layer > 0,
 	NewLayer is Layer-1,
 	get_platforms(Board,BoardSize,NewLayer,NewMoves),
 	get_layer_plataform(Board,BoardSize,NewLayer,Result),
@@ -117,25 +114,34 @@ get_platforms(Board,BoardSize,Layer,Moves) :-
 % get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
 % gets all available moves atop 2x2 platforms in a given layer
 get_layer_plataform(Board,BoardSize,Layer,Moves) :-
+  Layer mod 2 =:= 0,
   findall(X-Y-Orientation, (
     between(0, BoardSize, X), X mod 2 =:= 0,
     between(0, BoardSize, Y), Y mod 2 =:= 0,
-		get_piece(Board,X-Y,_-Layer),
-    check_plataform(Board, X-Y,Layer),
-    member(Orientation, [left, right, up, down])
-  ),Platforms),
-	maplist(plus_one,Platforms,Moves).
+    check_layer(Board,X-Y-Orientation,Layer)
+  ),Moves).
+get_layer_plataform(Board,BoardSize,Layer,Moves) :-
+  Layer mod 2 =:= 1,
+  findall(X-Y-Orientation, (
+    between(0, BoardSize, X), X mod 2 =:= 1,
+    between(0, BoardSize, Y), Y mod 2 =:= 1,
+    check_layer(Board,X-Y-Orientation,Layer)
+  ),Moves).
+
+check_layer(Board,X-Y-Orientation,Layer) :-
+  get_piece(Board,X-Y,_-Layer),
+  check_plataform(Board, X-Y,Layer),
+  member(Orientation, [left, right, up, down]).
 
 % check_plataform(+Board,+Coords,+Layer)
 % determines if there is a plataform starting on Coords
 check_plataform(Board,X-Y,Layer) :-
-	X2 is X+2,
-	Y2 is Y+2,
+	X2 is X+1,
+	Y2 is Y+1,
 	get_piece(Board,X-Y,_-Layer),
 	get_piece(Board,X2-Y,_-Layer),
 	get_piece(Board,X-Y2,_-Layer),
 	get_piece(Board,X2-Y2,_-Layer).
-
 
 result(-1, neutral).
 result(0, draw).
@@ -147,6 +153,9 @@ result(2, black).
 % case 1: one of the players win (kinda dfs)
 % case 2: one player loses all pieces (if the other player )
 % case 3: both players lose all pieces (draw)
+game_over([Board,_,_,_,_],draw) :-
+  \+ check_winner(Board,black),
+  \+ check_winner(Board,white).
 game_over([Board,_,_,_,_],white) :-
   check_winner(Board,white).
 game_over([Board,_,_,_,_],black) :-
