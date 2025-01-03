@@ -1,3 +1,10 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% UTILS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+
+max(A,B,C) :-
+  max_member(C,[A,B]).
+
 between(Min, Max, Min):- Min =< Max.
 between(Min, Max, Value):-
     Min < Max,
@@ -92,10 +99,14 @@ pair_vl(CurrentElement) :-
     CurrentElement mod 2 =:= 0,
     write('| ').
 
+% convert_coords(+X-Y,+BoardSize,-X-Y)
+% Converts the coordinates from (0,0) on the left upper corner as the first to (1,1) on the left down corner
 convert_coords(X-Y,BoardSize,NewX-NewY) :-
   NewY is BoardSize-Y,
   NewX is X-1.
 
+% number_line(+N)
+% Prints a number line from 1-N
 number_line(N) :-
   write('  x '),
   number_line(N,N),
@@ -129,6 +140,8 @@ number_line(N,Max) :-
   format('| ~d ~d ',[Current,Current2]),
   number_line(N2,Max).
 
+% show_winner(+Winner)
+% Shows the winner
 show_winner(black) :-
   nl,
   write('Blinq'),nl,
@@ -148,10 +161,14 @@ show_winner(draw) :-
   write('Draw'), nl,
   write('--------------------'),nl.
 
+% get_middle(+BoardSize,-X-Y)
+% gets the coordinates on the middle of the board
 get_middle(BoardSize,X-Y) :-
   X is BoardSize // 2 - 1,
   Y is BoardSize // 2 - 1.
 
+% write_number(+N)
+% writes a number with a padding
 write_number(N) :-
     N < 10,
     write(N),write(' ').

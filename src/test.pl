@@ -99,12 +99,12 @@ test_batch :-
   test_random_move.
 
 test_easy_bot :-
-  GameConfig = [3,easyBot-easyBot],
+  GameConfig = [5,easyBot-easyBot],
   initial_state(GameConfig,GameState),
   game_loop(GameState),!.
 
 test_hard_bot :-
-  GameConfig = [3,hardBot-hardBot],
+  GameConfig = [5,hardBot-hardBot],
   initial_state(GameConfig,GameState),
   game_loop(GameState),!.
 

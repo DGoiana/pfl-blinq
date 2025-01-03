@@ -1,3 +1,7 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MENU
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % level_convert(+LevelInput,-BotLevel)
 % converts input into bot level
 level_convert(1,easyBot).
@@ -51,8 +55,8 @@ get_orientation(Orientation) :-
 
 % get_orientation(+GameState,-Coords,-Orientation)
 % gets the desired move from the user
-get_move([Board,_,_,_,MaxLayer],X-Y,Orientation) :-
-  valid_moves([Board,_,_,_,MaxLayer],ValidMoves),
+get_move([Board,_,_,_,MaxLayer,_],X-Y,Orientation) :-
+  valid_moves([Board,_,_,_,MaxLayer,_],ValidMoves),
 
   length(Board,BoardSize),
   repeat,

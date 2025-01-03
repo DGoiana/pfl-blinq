@@ -1,4 +1,6 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BOARD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create_list(+Element,+Size,-List)
 % creates a list with an Element repeated Size times
@@ -14,23 +16,25 @@ create_board(Element, Size, Board):-
     create_list(Element, Size, List),
     create_list(List, Size, Board).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DISPLAY BOARD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-char(black,'b').
-char(white,'w').
-char(empty,'e').
+char(black,'o').
+char(white,'x').
+char(empty,' ').
 
-big_char(black,'B').
-big_char(white,'W').
-big_char(empty,'E').
+big_char(black,'O').
+big_char(white,'X').
+big_char(empty,'*').
 
 % display_item(+Item)
 % prints an element
-display_item(Item-Layer,X-Y,ValidMoves):- 
+display_item(Item-_,X-Y,ValidMoves):- 
     \+ member(Y-X-_,ValidMoves),
     char(Item, C), 
     write(C), write(' ').
-display_item(Item-Layer,X-Y,ValidMoves):- 
+display_item(Item-_,X-Y,ValidMoves):- 
     member(Y-X-_,ValidMoves),
     big_char(Item, C), 
     write(C), write(' ').
@@ -103,6 +107,11 @@ orientation(down,[white,white,black,black]).
 /* wb */
 /* bw */
 orientation(neutral,[white,black,black,white]).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CHANGE BOARD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % place_piece(+LastBoard,+Coords,+Orientation,-NewBoard)
 % puts a given piece (based on its orientation) in the board
