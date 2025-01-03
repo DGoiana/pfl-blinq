@@ -23,29 +23,28 @@ default(empty-0).
 play :- 
   menu(GameConfig),
   initial_state(GameConfig,GameState),
-  game_loop(GameState).
+  game_loop(GameState, 1).
 
 % game_loop(+GameState)
 % loop of the main game
-game_loop([Board,_,_-0,_-_,_,_]) :-
+game_loop([Board,_,_-0,_-_,_,_], _) :-
   show_winner(draw),
   display_board(Board,[]), !.
-game_loop([Board,_,_-_,_-0,_,_]) :-
+game_loop([Board,_,_-_,_-0,_,_], _) :-
   show_winner(draw),
   display_board(Board,[]), !.
-game_loop(GameState) :-
+game_loop(GameState, _) :-
   GameState = [Board,CurrentPlayer,_,_,_,_],
   game_over(GameState,CurrentPlayer),
   show_winner(CurrentPlayer),
   display_board(Board,[]), !.
-game_loop(GameState) :-
+game_loop(GameState, Play) :-
   write(GameState), nl,
   display_game(GameState),
-  write('bip'),
-  choose_move(GameState, _, Move),
-  write('bop'),
+  choose_move(GameState, Move, Play),
   move(GameState,Move,NewGameState),
-  game_loop(NewGameState).
+  NextPlay is Play+1,
+  game_loop(NewGameState, NextPlay).
 
 % initial_state(+GameConfig, -GameState)
 % returns the initial game state giving a game configuration
@@ -237,23 +236,23 @@ check_color(Board, X1-Y1, X2-Y2) :-
 % scores the current game state
 
 value([Board, _ , _ , _ , _ , LongestSequenceWhite-_], white, Value) :-
-  findall(SeqScore, (
+  /* findall(SeqScore, (
     within_coords(Board,X-Y),
     nth0(X, Board, Row),
     nth0(Y, Row, white-_),
     sequence_score(Board, X-Y, white, SeqScore)
     ), Scores),
-  max_member(MaxScore, Scores),
-  Value is MaxScore + LongestSequenceWhite * 0.1.
+  max_member(MaxScore, Scores), */
+  Value = LongestSequenceWhite.
 
 value([Board, _ , _ , _ , _ , _-LongestSequenceBlack], black, Value) :-
-  findall(SeqScore, (
+  /*findall(SeqScore, (
     nth0(X, Board, Row),
     nth0(Y, Row, black-_),
     sequence_score(Board, X-Y, black, SeqScore)
     ), Scores),
-  max_member(MaxScore, Scores),
-  Value is MaxScore + LongestSequenceBlack * 0.1.
+  max_member(MaxScore, Scores), */
+  Value = LongestSequenceBlack.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -285,6 +284,7 @@ sequence_score(Board, X-Y, black, Score) :-
 % updates longest sequence if newly inserted piece increases it
 replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequence) :- 
   dfs_visit(Board, Player, [X-Y], [], _, Length),
+  write('DFS starting in '), write(X-Y), write(': '), write(Length), nl,
   max(CurrentLongestSequence, Length, NewLongestSequence).
 
 % choose_move(+GameState, +Level, -Move)
@@ -293,19 +293,21 @@ replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequ
 
 % [Board, _ , _ , _ , _ , _-LongestSequenceBlack]
 
-choose_move([Board, white, hardBot-WhitePiecesLeft, _-_, MaxLayer,LongestSequenceWhite-_], hard, Move) :-
+choose_move([Board, white, hardBot-WhitePiecesLeft, _-_, MaxLayer,LongestSequenceWhite-_], Move, Play) :-
+  Play > 2,
   valid_moves([Board, _, _, _, MaxLayer,_], Moves),
   findall(Value-PossibleMove, (
     member(PossibleMove, Moves),
     PossibleMove = X-Y-Orientation,
     place_piece(Board, X-Y, Orientation, NewBoard),
     replace_long_sequence(NewBoard, X-Y, LongestSequenceWhite, white, NewLongestSequenceWhite),
-    NewGameState = [NewBoard, _ , _-_ , _-_ , _ , NewLongestSequenceWhite-_],
+    NewGameState = [NewBoard, _ , _-_ , _-_ , _ , NewLongestSequenceWhite-_], 
     value(NewGameState, white, Value)
   ), ScoredMoves),
   max_member(_-Move, ScoredMoves).
 
-choose_move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer, _-LongestSequenceBlack], hard, Move) :-
+choose_move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer, _-LongestSequenceBlack], Move, Play) :-
+  Play > 2,
   valid_moves([Board, _, _, _, MaxLayer,_], Moves),
   findall(Value-PossibleMove, (
     member(PossibleMove, Moves), 
@@ -317,10 +319,18 @@ choose_move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer, _-LongestSequ
   ), ScoredMoves),
   max_member(_-Move, ScoredMoves).
 
-choose_move([Board,white,easyBot-_,_-_,MaxLayer,_], _ , X-Y-Orientation) :- 
+choose_move([Board, black, _-_, hardBot-_, MaxLayer, _], X-Y-Orientation, 2) :-
   valid_moves([Board,_,_,_,MaxLayer,_],Moves),
   random_member(X-Y-Orientation, Moves).
-choose_move([Board,white,player-_,_-_,MaxLayer,_], _ , X-Y-Orientation) :-
+
+choose_move([Board, white, hardBot-_, _-_, MaxLayer, _], X-Y-Orientation, 1) :-
+  valid_moves([Board,_,_,_,MaxLayer,_],Moves),
+  random_member(X-Y-Orientation, Moves).
+
+choose_move([Board,white,easyBot-_,_-_,MaxLayer,_] , X-Y-Orientation, _) :- 
+  valid_moves([Board,_,_,_,MaxLayer,_],Moves),
+  random_member(X-Y-Orientation, Moves).
+choose_move([Board,white,player-_,_-_,MaxLayer,_] , X-Y-Orientation, _) :-
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
@@ -328,13 +338,11 @@ choose_move([Board,white,player-_,_-_,MaxLayer,_], _ , X-Y-Orientation) :-
   write('--------------------'),nl,
 
   get_move([Board,_,_,_,MaxLayer,_],X-Y,Orientation).
-/* 
-choose_move([Board,black,WhiteType-WhitePieces,hardBot-BlackPieces,MaxLayer],X-Y) :- .
-*/
-choose_move([Board,black,_-_,easyBot-_,MaxLayer,_], _ , X-Y-Orientation) :- 
+
+choose_move([Board,black,_-_,easyBot-_,MaxLayer,_] , X-Y-Orientation, _) :- 
   valid_moves([Board,_,_,_,MaxLayer,_],Moves),
   random_member(X-Y-Orientation, Moves).
-choose_move([Board,black,_-_,player-_,MaxLayer,_], _ , X-Y-Orientation) :- 
+choose_move([Board,black,_-_,player-_,MaxLayer,_] , X-Y-Orientation, _) :- 
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
