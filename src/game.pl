@@ -165,36 +165,34 @@ game_over([Board,_,_,_,_,_],black) :-
 
 % check_winner(+Board, -Winner)
 % checks if anyone has won the game in the current board
-check_winner(Board, Player) :- 
-  dfs(Board, Player, Winner, _),
+check_winner(Board, Winner) :- 
+  dfs(Board, Player, Winner),
   Player = Winner.
 
 % dfs(+Board, +Player, -Won)
 % performs a dfs to see if the player has already won the game
-dfs(Board, white, Won, Length) :-
+dfs(Board, white, Won) :-
   findall(0-Y, (nth0(0, Board, Row), (nth0(Y, Row, white-_))), Pieces),
   member(Start, Pieces),
-  dfs_visit(Board, white, [Start], [], Won, Length).
+  dfs_visit(Board, white, [Start], [], Won).
 
-dfs(Board, black, Won, Length) :-
+dfs(Board, black, Won) :-
   findall(X-0, (nth0(X, Board, Row), (nth0(0, Row, black-_))), Pieces),
   member(Start, Pieces),
-  dfs_visit(Board, black, [Start], [], Won, Length).
+  dfs_visit(Board, black, [Start], [], Won).
   
 % dfs_visit(+Board, +Player, +ToVisit, +AlreadyVisited, -Won)
 % helper function for dfs traversal
-dfs_visit(_, _, [], Visited, false, Length) :-
-  length(Visited, Length).
-dfs_visit(Board, Player, [Current|_], _, Player, Length) :-
+dfs_visit(_, _, [], _, false).
+dfs_visit(Board, Player, [Current|_], _, Player) :-
   Current = X-Y,
-  end_game(Board, X-Y, Player),
-  Length is 1.
-dfs_visit(Board, Player, [Current|ToVisit], Visited, Won, Length) :-
+  end_game(Board, X-Y, Player).
+dfs_visit(Board, Player, [Current|ToVisit], Visited, Won) :-
   Current = X-Y,
-  findall(Next, (neighbor(X-Y, Next), within_coords(Board, Next), \+ member(Next, Visited), \+ member(Next, ToVisit), check_color(Board, Current, Next)), Neighbors),
+  findall(Next, (neighbor(X-Y, Next), within_coords(Board, Next), \+ member(Next, Visited), \+ member(Next, ToVisit), check_color(Board, Next, Player)), Neighbors),
   append(Neighbors, ToVisit, NewToVisit),
   sort(NewToVisit, SortedToVisit),
-  dfs_visit(Board, Player, SortedToVisit, [Current|Visited], Won, Length).
+  dfs_visit(Board, Player, SortedToVisit, [Current|Visited], Won).
 
 % neighbor(+Coords, -NeighborCoords)
 % return neighbor coords
@@ -225,34 +223,30 @@ within_coords(Board, X-Y) :-
 
 % check_color(+Board, +CoordsCurrent, +CoordsNext)
 % check if the color from the next neigbor is the same as the current
-check_color(Board, X1-Y1, X2-Y2) :-
-  nth0(X1, Board, Row1),
-  nth0(Y1, Row1, Color1-_),
-  nth0(X2, Board, Row2),
-  nth0(Y2, Row2, Color2-_),
-  Color1 = Color2.
+check_color(Board, X1-Y1, Player) :-
+  get_piece(Board,X1-Y1,Player-_).
 
 % value(+GameState, +Player, -Value)
 % scores the current game state
 
 value([Board, _ , _ , _ , _ , LongestSequenceWhite-_], white, Value) :-
-  /* findall(SeqScore, (
+  findall(SeqScore, (
     within_coords(Board,X-Y),
     nth0(X, Board, Row),
     nth0(Y, Row, white-_),
     sequence_score(Board, X-Y, white, SeqScore)
     ), Scores),
-  max_member(MaxScore, Scores), */
-  Value = LongestSequenceWhite.
+  max_member(MaxScore, Scores),
+  Value = LongestSequenceWhite + MaxScore.
 
 value([Board, _ , _ , _ , _ , _-LongestSequenceBlack], black, Value) :-
-  /*findall(SeqScore, (
+  findall(SeqScore, (
     nth0(X, Board, Row),
     nth0(Y, Row, black-_),
     sequence_score(Board, X-Y, black, SeqScore)
     ), Scores),
-  max_member(MaxScore, Scores), */
-  Value = LongestSequenceBlack.
+  max_member(MaxScore, Scores),
+  Value = LongestSequenceBlack + MaxScore.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -283,9 +277,26 @@ sequence_score(Board, X-Y, black, Score) :-
 % replace_long_sequence(+Board, +Coords, +LongestWhiteSequence, +Player , -NewLongestWhiteSequence)
 % updates longest sequence if newly inserted piece increases it
 replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequence) :- 
-  dfs_visit(Board, Player, [X-Y], [], _, Length),
-  write('DFS starting in '), write(X-Y), write(': '), write(Length), nl,
+  dfs_sequence(Board, [X-Y], Player, [], Length),
   max(CurrentLongestSequence, Length, NewLongestSequence).
+  %write(CurrentLongestSequence), write( 'turned into '), write(NewLongestSequence), nl.
+
+% dfs_sequence(+Board, +ToVisit, +Player, +Visited, -Length)
+dfs_sequence(_, [], _, _, 0).
+dfs_sequence(Board, [X-Y | ToVisit], Player, Visited, Length) :-
+  \+ member(X-Y, Visited),
+  findall(Neighbor, (
+      neighbor(X-Y, Neighbor),
+      within_coords(Board, Neighbor),
+      check_color(Board, Neighbor, Player),
+      \+ member(Neighbor, ToVisit),
+      \+ member(Neighbor, Visited)
+    ), Neighbors),
+  append(Neighbors, ToVisit, NewToVisit),
+  dfs_sequence(Board, NewToVisit, Player, [X-Y | Visited], SubLength),
+  Length is SubLength + 1.
+dfs_sequence(Board, [_ | ToVisit], Player, Visited, Length) :-
+  dfs_sequence(Board, ToVisit, Player, Visited, Length).
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
@@ -293,31 +304,51 @@ replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequ
 
 % [Board, _ , _ , _ , _ , _-LongestSequenceBlack]
 
-choose_move([Board, white, hardBot-WhitePiecesLeft, _-_, MaxLayer,LongestSequenceWhite-_], Move, Play) :-
-  Play > 2,
-  valid_moves([Board, _, _, _, MaxLayer,_], Moves),
-  findall(Value-PossibleMove, (
-    member(PossibleMove, Moves),
-    PossibleMove = X-Y-Orientation,
-    place_piece(Board, X-Y, Orientation, NewBoard),
-    replace_long_sequence(NewBoard, X-Y, LongestSequenceWhite, white, NewLongestSequenceWhite),
-    NewGameState = [NewBoard, _ , _-_ , _-_ , _ , NewLongestSequenceWhite-_], 
-    value(NewGameState, white, Value)
-  ), ScoredMoves),
-  max_member(_-Move, ScoredMoves).
+correct_top_left_corner(left, white, X-Y, X1-Y) :- X1 is X+1.
+correct_top_left_corner(left, black,  X-Y , X-Y).
 
-choose_move([Board, black, _-_, hardBot-BlackPiecesLeft, MaxLayer, _-LongestSequenceBlack], Move, Play) :-
+correct_top_left_corner(up, white, X-Y, X-Y1) :- Y1 is Y+1.
+correct_top_left_corner(up, black, X-Y , X-Y).
+
+correct_top_left_corner(down, white,  X-Y , X-Y).
+correct_top_left_corner(down, black, X-Y, X-Y1) :- Y1 is Y+1.
+
+correct_top_left_corner(right, white, X-Y , X-Y).
+correct_top_left_corner(right, black, X-Y, X1-Y) :- X1 is X+1.
+
+choose_move([Board, white, hardBot-_, _-_, MaxLayer, LongestSequenceWhite-_], Move, Play) :-
   Play > 2,
-  valid_moves([Board, _, _, _, MaxLayer,_], Moves),
-  findall(Value-PossibleMove, (
-    member(PossibleMove, Moves), 
-    PossibleMove = X-Y-Orientation,
-    place_piece(Board, X-Y, Orientation, NewBoard),
-    replace_long_sequence(NewBoard, X-Y, LongestSequenceBlack, black, NewLongestSequenceBlack),
-    NewGameState = [NewBoard, _ , _-_ , _-_ , _ , _-NewLongestSequenceBlack],
-    value(NewGameState, black, Value)
-  ), ScoredMoves),
-  max_member(_-Move, ScoredMoves).
+  
+  valid_moves([Board, _, _, _, MaxLayer, _], Moves),
+
+  maplist(evaluate_move(Board, LongestSequenceWhite, white), Moves, ScoredMoves),
+  
+  max_member(_-X-Y-Orientation, ScoredMoves),
+  Move = X-Y-Orientation.
+
+evaluate_move(Board, LongestSequenceWhite, white, X-Y-Orientation, Value-X-Y-Orientation) :-
+  place_piece(Board, X-Y, Orientation, NewBoard),
+  correct_top_left_corner(Orientation, white, X-Y, NewX-NewY),
+  replace_long_sequence(NewBoard, NewX-NewY, LongestSequenceWhite, white, NewLongestSequenceWhite),
+  NewGameState = [NewBoard, _, _-_, _-_, _, NewLongestSequenceWhite-_],
+  value(NewGameState, white, Value).
+
+evaluate_move(Board, LongestSequenceBlack, black, X-Y-Orientation, Value-X-Y-Orientation) :-
+  place_piece(Board, X-Y, Orientation, NewBoard),
+  correct_top_left_corner(Orientation, black, X-Y, NewX-NewY),
+  replace_long_sequence(NewBoard, NewX-NewY, LongestSequenceBlack, black, NewLongestSequenceBlack),
+  NewGameState = [NewBoard, _, _-_, _-_, _, _-NewLongestSequenceBlack],
+  value(NewGameState, black, Value).
+
+choose_move([Board, black, _-_, hardBot-_, MaxLayer, _-LongestSequenceBlack], Move, Play) :-
+  Play > 2,
+  
+  valid_moves([Board, _, _, _, MaxLayer, _], Moves),
+
+  maplist(evaluate_move(Board, LongestSequenceBlack, black, NewLongestSequence), Moves, ScoredMoves),
+    
+  max_member(_-X-Y-Orientation, ScoredMoves),
+  Move = X-Y-Orientation.
 
 choose_move([Board, black, _-_, hardBot-_, MaxLayer, _], X-Y-Orientation, 2) :-
   valid_moves([Board,_,_,_,MaxLayer,_],Moves),
