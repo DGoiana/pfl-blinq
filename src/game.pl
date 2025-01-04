@@ -345,7 +345,7 @@ choose_move([Board, black, _-_, hardBot-_, MaxLayer, _-LongestSequenceBlack], Mo
   
   valid_moves([Board, _, _, _, MaxLayer, _], Moves),
 
-  maplist(evaluate_move(Board, LongestSequenceBlack, black, NewLongestSequence), Moves, ScoredMoves),
+  maplist(evaluate_move(Board, LongestSequenceBlack, black), Moves, ScoredMoves),
     
   max_member(_-X-Y-Orientation, ScoredMoves),
   Move = X-Y-Orientation.
