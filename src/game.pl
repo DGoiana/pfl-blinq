@@ -88,7 +88,8 @@ display_game(GameState) :-
 
 % move(+GameState, +Move, -NewGameState)
 % returns the new game state after a certain move, if the move is valid
-move(GameState,X-Y-Orientation,NewGameState) :-
+move(GameState,Move,NewGameState) :-
+  Move = X-Y-Orientation,
   GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer,LongestSequenceWhite-LongestSequenceBlack, Play],
   place_piece(CurrentBoard,X-Y,Orientation,NewBoard),
   change_pieces(CurrentPlayer,PiecesWhite,PiecesBlack,NewPiecesWhite,NewPiecesBlack),
@@ -335,18 +336,22 @@ choose_move([Board, black, _-_, hardBot-_, MaxLayer, _-LongestSequenceBlack, Pla
   max_member(_-X-Y-Orientation, ScoredMoves),
   Move = X-Y-Orientation.
 
-choose_move([Board, black, _-_, hardBot-_, MaxLayer, _, 2], _ , X-Y-Orientation) :-
+choose_move([Board, black, _-_, hardBot-_, MaxLayer, _, 2], _ , Move) :-
+  Move = X-Y-Orientation,
   valid_moves([Board,_,_,_,MaxLayer,_, _],Moves),
   random_member(X-Y-Orientation, Moves).
 
-choose_move([Board, white, hardBot-_, _-_, MaxLayer, _, 1], _ , X-Y-Orientation) :-
+choose_move([Board, white, hardBot-_, _-_, MaxLayer, _, 1], _ , Move) :-
+  Move = X-Y-Orientation,
   valid_moves([Board,_,_,_,MaxLayer,_, _],Moves),
   random_member(X-Y-Orientation, Moves).
 
-choose_move([Board,white,easyBot-_,_-_,MaxLayer,_, _] , _ , X-Y-Orientation) :- 
+choose_move([Board,white,easyBot-_,_-_,MaxLayer,_, _] , _ , Move) :- 
+  Move = X-Y-Orientation,
   valid_moves([Board,_,_,_,MaxLayer,_, _],Moves),
   random_member(X-Y-Orientation, Moves).
-choose_move([Board,white,player-_,_-_,MaxLayer,_, _] , _ , X-Y-Orientation) :-
+choose_move([Board,white,player-_,_-_,MaxLayer,_, _] , _ , Move) :-
+  Move = X-Y-Orientation,
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
@@ -355,10 +360,12 @@ choose_move([Board,white,player-_,_-_,MaxLayer,_, _] , _ , X-Y-Orientation) :-
 
   get_move([Board,_,_,_,MaxLayer,_, _],X-Y,Orientation).
 
-choose_move([Board,black,_-_,easyBot-_,MaxLayer,_,_] , _ , X-Y-Orientation) :- 
+choose_move([Board,black,_-_,easyBot-_,MaxLayer,_,_] , _ , Move) :- 
+  Move = X-Y-Orientation,
   valid_moves([Board,_,_,_,MaxLayer,_, _],Moves),
   random_member(X-Y-Orientation, Moves).
-choose_move([Board,black,_-_,player-_,MaxLayer,_, _] , _ , X-Y-Orientation) :- 
+choose_move([Board,black,_-_,player-_,MaxLayer,_, _] , _ , Move) :- 
+  Move = X-Y-Orientation,
   nl,
   write('Blinq'),nl,
   write('--------------------'),nl,
