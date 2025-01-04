@@ -34,12 +34,16 @@ game_loop([Board,_,_-_,_-0,_,_], _) :-
   show_winner(draw),
   display_board(Board,[]), !.
 game_loop(GameState, _) :-
-  GameState = [Board,CurrentPlayer,_,_,_,_],
-  game_over(GameState,CurrentPlayer),
-  show_winner(CurrentPlayer),
+  GameState = [Board,_,_,_,_,_],
+  game_over(GameState,white),
+  show_winner(white),
+  display_board(Board,[]), !.
+game_loop(GameState, _) :-
+  GameState = [Board,_,_,_,_,_],
+  game_over(GameState,black),
+  show_winner(black),
   display_board(Board,[]), !.
 game_loop(GameState, Play) :-
-  write(GameState), nl,
   display_game(GameState),
   choose_move(GameState, Move, Play),
   move(GameState,Move,NewGameState),
@@ -274,7 +278,6 @@ sequence_score(Board, _-Y, black, Score) :-
 replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequence) :- 
   dfs_sequence(Board, [X-Y], Player, [], Length),
   max(CurrentLongestSequence, Length, NewLongestSequence).
-  %write(CurrentLongestSequence), write( 'turned into '), write(NewLongestSequence), nl.
 
 % dfs_sequence(+Board, +ToVisit, +Player, +Visited, -Length)
 dfs_sequence(_, [], _, _, 0).

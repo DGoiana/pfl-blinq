@@ -88,10 +88,8 @@ switch_player(white,black).
 % change_pieces(+CurrentPlayer,+CurrentWhitePieces,+CurrentBlackPieces,-NewWhitePieces,-NewBlackPieces)
 % decreases the number of pieces according to player
 change_pieces(white,CurrentWhitePieces,CurrentBlackPieces,NewWhitePieces,CurrentBlackPieces) :-
-  write(CurrentWhitePieces),
   NewWhitePieces is CurrentWhitePieces-1.
 change_pieces(black,CurrentWhitePieces,CurrentBlackPieces,CurrentWhitePieces,NewBlackPieces) :-
-  write(CurrentBlackPieces),
   NewBlackPieces is CurrentBlackPieces-1.
 
 % hl(+BoardSize)
