@@ -67,7 +67,7 @@ initial_state(GameConfig, GameState) :-
 % display_game(+GameState)
 % prints the game state to the terminal
 display_game(GameState) :-
-    GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer,LongestSequenceWhite-LongestSequenceBlack, _],
+    GameState = [CurrentBoard,CurrentPlayer,PlayerTypeWhite-PiecesWhite,PlayerTypeBlack-PiecesBlack,MaxLayer,_-_, _],
     nl,
     write('Blinq'),nl,
     write('--------------------'),nl,
@@ -77,8 +77,6 @@ display_game(GameState) :-
     format('Black Type : ~s',PlayerTypeBlack), nl,
     format('Black Pieces: ~d',PiecesBlack), nl,
     format('Max Layer: ~d',MaxLayer), nl,
-    format('LongestSequenceWhite: ~d',LongestSequenceWhite), nl,
-    format('LongestSequenceBlack: ~d',LongestSequenceBlack), nl,
     write('--------------------'),nl,
     nl,
 
