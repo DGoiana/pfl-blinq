@@ -87,6 +87,13 @@ menu([BoardSize,GameType]) :-
   write('2- Bot-Player'), nl,
   write('3- Player-Bot'), nl,
   write('4- Player-Player'), nl,
+  write('5- Exit'), nl,
   write('Type:'),
-  get_input(1,4,Type),
+  get_input(1,5,Type),
+  exit(Type),
   get_type(Type,GameType).
+
+% exit(Type)
+% exists the game
+exit(5) :- !,fail.
+exit(_).
