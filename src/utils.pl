@@ -11,13 +11,30 @@ between(Min, Max, Value):-
     NextMin is Min + 1,
     between(NextMin, Max, Value).
 
+
+read_number(X) :- read_number(X,0).
+read_number(Acc,Acc) :- peek_code(10),get_code(10),!.
+read_number(X,Acc) :-
+  get_code(V),
+  Number is V-48,
+  NewAcc is Acc*10 + Number,
+  read_number(X,NewAcc).
+
 % get_input(+Min,+Max,-Value)
 % gets an input value from user until the value is in range (Min,Max)
 get_input(Min,Max,Value) :-
   repeat,
-  read(Value),
-  number(Value),
-  between(Min,Max,Value), !.
+  read_number(Value),
+  validate_input(Min,Max,Value), !.
+
+validate_input(Min,Max,Value) :-
+  between(Min,Max,Value).
+
+validate_input(Min,Max,Value) :-
+  \+ between(Min,Max,Value),
+  write('Invalid Input'), nl,
+  write('Try again:'),
+  fail.
 
 % get_pieces(+BoardSize,-Pieces)
 % get number of starting pieces for each player from BoardSize

@@ -38,17 +38,14 @@ convert_orientation(4,down).
 % get_orientation(-Orientation)
 % gets the desired orientation of a move from the user
 get_orientation(Orientation) :-
-  write('1- bw'), nl,
-  write('   bw'), nl,
+  write('Possible Orientations:'),nl,
   nl,
-  write('2- wb'), nl,
-  write('   wb'), nl,
+  write('1- bw  2- wb'), nl,
+  write('   bw     wb'), nl,
   nl,
-  write('3- bb'), nl,
-  write('   ww'), nl,
+  write('3- bb  4- ww'), nl,
+  write('   ww     bb'), nl,
   nl,
-  write('4- ww'), nl,
-  write('   bb'), nl,
   write('Orientation:'),
   get_input(1,4,OrientationInput),
   convert_orientation(OrientationInput,Orientation).
@@ -66,10 +63,17 @@ get_move([Board,_,_,_,MaxLayer,_],X-Y,Orientation) :-
   get_input(0,BoardSize,YInput),
   get_orientation(Orientation),
   convert_coords(XInput-YInput,BoardSize,X-Y),
-  write(X-Y-Orientation),nl,
-  write(XInput-YInput-Orientation),nl,
-  check_valid_move(X-Y-Orientation,ValidMoves),
+  validate_valid_move(X-Y-Orientation,ValidMoves),
   !.
+
+validate_valid_move(X-Y-Orientation,ValidMoves) :-
+  check_valid_move(X-Y-Orientation,ValidMoves).
+  
+validate_valid_move(X-Y-Orientation,ValidMoves) :-
+  \+ check_valid_move(X-Y-Orientation,ValidMoves),
+  write('Invalid Move. Try again'), nl,
+  fail.
+
 
 % menu(-GameConfig)
 % prints menu and defines GameConfig
