@@ -168,7 +168,7 @@ black_wins(Board) :-
   member(Piece, Pieces),
   path_exists(Board, Piece, black, Last-_).
 
-% white_wins(+Board)
+
 % checks if white has a winning board
 white_wins(Board) :-
   length(Board, BoardSize),
@@ -190,7 +190,7 @@ dfs(_, [Current|_], _, _, Target) :-
 
 % performs dfs
 dfs(Board, [Current|Rest], Visited, Color, Target) :-
-  \+ is_target_reached(Current, Target),
+  Current \= Target,
   findall(Neighbor, (
     neighbor(Current, Neighbor),
     within_coords(Board, Neighbor),

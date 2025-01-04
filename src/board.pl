@@ -20,12 +20,12 @@ create_board(Element, Size, Board):-
 % DISPLAY BOARD
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-char(black,'o').
-char(white,'x').
+char(black,'b').
+char(white,'w').
 char(empty,' ').
 
-big_char(black,'O').
-big_char(white,'X').
+big_char(black,'B').
+big_char(white,'W').
 big_char(empty,'*').
 
 % display_item(+Item)
