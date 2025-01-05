@@ -9,7 +9,6 @@
 
 default(empty-0).
 
-
 % play()
 % gives access to menu and starts game cycle
 play :- 
@@ -18,6 +17,9 @@ play :-
   game_loop(GameState), !,
   play_again.
 
+
+% play_again()
+% displays the prompt to restart the game once finished
 play_again :-
   nl,
   write('Blinq'),nl,
@@ -31,8 +33,13 @@ play_again :-
   between(1,2,Value),
   act_restart(Value), !.
 
-act_restart(2) :- !,fail.
-act_restart(1) :- !,play.
+
+% act_restart(+Option)
+% restart the game or abort given the playe's option
+act_restart(2) :- !, fail.
+
+act_restart(1) :- !, play.
+
 
 % game_loop(+GameState)
 % loop of the main game
@@ -40,25 +47,30 @@ game_loop(GameState) :-
   GameState = [Board,_,_-0,_-_,_,_,_],
   show_winner(draw),
   display_board(Board,[]).
+
 game_loop(GameState) :-
   GameState = [Board,_,_-_,_-0,_,_,_],
   show_winner(draw),
   display_board(Board,[]).
+
 game_loop(GameState) :-
   GameState = [Board,_,_,_,_,_,_],
   game_over(GameState,draw),
   show_winner(draw),
   display_board(Board,[]).
+
 game_loop(GameState) :-
   GameState = [Board,_,_,_,_,_,_],
   game_over(GameState,white),
   show_winner(white),
   display_board(Board,[]).
+
 game_loop(GameState) :-
   GameState = [Board,_,_,_,_,_,_],
   game_over(GameState,black),
   show_winner(black),
   display_board(Board,[]).
+
 game_loop(GameState) :-
   display_game(GameState),
   choose_move(GameState, _ , Move),
@@ -66,7 +78,11 @@ game_loop(GameState) :-
   increase_play(NewGameState, UpdatedGameState),
   game_loop(UpdatedGameState).
 
+
+% increase_play(+GameState, +NewGameState)
+% updates the next move's number in current game state
 increase_play([Board, P1, P2, P3, P4, P5, Play], [Board, P1, P2, P3, P4, P5, NewPlay]) :- NewPlay is Play + 1.
+
 
 % initial_state(+GameConfig, -GameState)
 % returns the initial game state giving a game configuration
@@ -79,6 +95,7 @@ initial_state(GameConfig, GameState) :-
   place_piece(CurrentBoard,X-Y,neutral,NewBoard),
   get_pieces(GameSize,StartPieces),
   GameState = [NewBoard, white, PType1-StartPieces, PType2-StartPieces,0,0-0,1].
+
 
 % display_game(+GameState)
 % prints the game state to the terminal
@@ -95,7 +112,6 @@ display_game(GameState) :-
     format('Max Layer: ~d',MaxLayer), nl,
     write('--------------------'),nl,
     nl,
-
     valid_moves(GameState,ValidMoves),
     display_board(CurrentBoard,ValidMoves).
 
@@ -112,38 +128,46 @@ move(GameState,Move,NewGameState) :-
   gt(Layer,MaxLayer,NewMaxLayer),
   NewGameState = [NewBoard,NewPlayer,PlayerTypeWhite-NewPiecesWhite,PlayerTypeBlack-NewPiecesBlack,NewMaxLayer,LongestSequenceWhite-LongestSequenceBlack, Play].
 
+
+% check_valid_move(+Move, +ValidModes)
+% checks if a certain move is a valid one
 check_valid_move(X-Y-_,ValidMoves) :-
   member(X-Y-_,ValidMoves).
+
 
 % valid_moves(+GameState, -ListOfMoves)
 % returns the list of possible moves in a certain game state
 % case 1: piece is empty
-% case 2: there is 2x2 plataform with the same Layer
+% case 2: there is 2x2 platform with the same Layer
 valid_moves([Board,_,_,_,MaxLayer,_,_],ListOfMoves) :-
   length(Board,BoardLength),
 	NewMaxLayer is MaxLayer+1,
 	get_platforms(Board,BoardLength,NewMaxLayer,ListOfMoves).
   
+
 % get_platforms(+Board,+BoardSize,+Layer,-Moves)
 % gets all availables moves atop 2x2 platforms from MaxLayer to 1.
 get_platforms(_,_,0,[]).
+
 get_platforms(Board,BoardSize,Layer,Moves) :-
 	Layer > 0,
 	NewLayer is Layer-1,
 	get_platforms(Board,BoardSize,NewLayer,NewMoves),
-	get_layer_plataform(Board,BoardSize,NewLayer,Result),
+	get_layer_platform(Board,BoardSize,NewLayer,Result),
 	append(NewMoves,Result,Moves).
 
-% get_layer_plataform(+Board,+BoardSize,+Layer,-Moves)
+
+% get_layer_platform(+Board,+BoardSize,+Layer,-Moves)
 % gets all available moves atop 2x2 platforms in a given layer
-get_layer_plataform(Board,BoardSize,Layer,Moves) :-
+get_layer_platform(Board,BoardSize,Layer,Moves) :-
   Layer mod 2 =:= 0,
   findall(X-Y-Orientation, (
     between(0, BoardSize, X), X mod 2 =:= 0,
     between(0, BoardSize, Y), Y mod 2 =:= 0,
     check_layer(Board,X-Y-Orientation,Layer)
   ),Moves).
-get_layer_plataform(Board,BoardSize,Layer,Moves) :-
+
+get_layer_platform(Board,BoardSize,Layer,Moves) :-
   Layer mod 2 =:= 1,
   findall(X-Y-Orientation, (
     between(0, BoardSize, X), X mod 2 =:= 1,
@@ -151,14 +175,18 @@ get_layer_plataform(Board,BoardSize,Layer,Moves) :-
     check_layer(Board,X-Y-Orientation,Layer)
   ),Moves).
 
+
+% check_layer(+Board, +Move, +Layer)
+% checks every platform in a layer
 check_layer(Board,X-Y-Orientation,Layer) :-
   get_piece(Board,X-Y,_-Layer),
-  check_plataform(Board, X-Y,Layer),
+  check_platform(Board, X-Y,Layer),
   member(Orientation, [left, right, up, down]).
 
-% check_plataform(+Board,+Coords,+Layer)
-% determines if there is a plataform starting on Coords
-check_plataform(Board,X-Y,Layer) :-
+
+% check_platform(+Board,+Coords,+Layer)
+% determines if there is a platform starting on Coords
+check_platform(Board,X-Y,Layer) :-
 	X2 is X+1,
 	Y2 is Y+1,
 	get_piece(Board,X-Y,_-Layer),
@@ -166,20 +194,19 @@ check_plataform(Board,X-Y,Layer) :-
 	get_piece(Board,X-Y2,_-Layer),
 	get_piece(Board,X2-Y2,_-Layer).
 
-result(-1, neutral).
-result(0, draw).
-result(1, white).
-result(2, black).
 
 % game_over(+GameState, -Winner)
 % checks if the game is over in the current game state
 game_over([Board,_,_,_,_,_,_],white) :- 
   white_wins(Board), !.
+
 game_over([Board,_,_,_,_,_,_],black) :- 
   black_wins(Board), !.
+
 game_over(GameState,draw) :-
   valid_moves(GameState,Moves),
   length(Moves,0).
+
 
 % black_wins(+Board)
 % checks if black has a winning board
@@ -191,7 +218,7 @@ black_wins(Board) :-
   member(Piece, Pieces),
   path_exists(Board, Piece, black, Last-_).
 
-
+% white_wins(+Board)
 % checks if white has a winning board
 white_wins(Board) :-
   length(Board, BoardSize),
@@ -201,17 +228,18 @@ white_wins(Board) :-
   member(Piece, Pieces),
   path_exists(Board, Piece, white, _-Last).
 
+
 % path_exists(+Board, +Start, +Color, +Target)
 % checks if there is a path between start and target
 path_exists(Board, Start, Color, Target) :-
   dfs(Board, [Start], [], Color, Target).
 
+
 % dfs(+Board, +Stack, +Visited, +Color, -End, +TargetRowOrCol)
-% found a path from start to target
+% dfs algorithm in order to perform a search in a contiguous same colored sequence
 dfs(_, [Current|_], _, _, Target) :-
   Current = Target.
 
-% performs dfs
 dfs(Board, [Current|Rest], Visited, Color, Target) :-
   Current \= Target,
   findall(Neighbor, (
@@ -223,6 +251,7 @@ dfs(Board, [Current|Rest], Visited, Color, Target) :-
   ), Neighbors),
   append(Neighbors, Rest, NewStack),
   dfs(Board, NewStack, [Current|Visited], Color, Target).
+
 
 % neighbor(+Coords, -NeighborCoords)
 % return neighbor coords
@@ -240,10 +269,12 @@ within_coords(Board, X-Y) :-
   between(0, NewSize, X),
   between(0, NewSize, Y).
 
+
 % check_color(+Board, +CoordsCurrent, +CoordsNext)
-% check if the color from the next neigbor is the same as the current
+% check the color of a specific piece
 check_color(Board, X1-Y1, Player) :-
   get_piece(Board,X1-Y1,Player-_).
+
 
 % value(+GameState, +Player, -Value)
 % scores the current game state
@@ -266,30 +297,33 @@ value([Board, _ , _ , _ , _ , _-LongestSequenceBlack, _], black, Value) :-
   max_member(MaxScore, Scores),
   Value = LongestSequenceBlack + MaxScore.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% sequence_score(+Board, +Coords, +Player, -Score)
+% returns an higher or lower score if a piece is closer or further from the start/finish line.
+% within the first half, pieces closer to the start line are more valuable
+% in the second half, pieces closer to the finish line are more valuable
 sequence_score(Board, X-_, white, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   X < HalfSize,
   Score is -X.
+
 sequence_score(Board, X-_, white, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   X >= HalfSize,
   Score is -(Size - X).
+
 sequence_score(Board, _-Y, black, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   Y < HalfSize,
   Score is -Y.
+
 sequence_score(Board, _-Y, black, Score) :-
   length(Board, Size),
   HalfSize is Size // 2,
   Y >= HalfSize,
   Score is -(Size - Y).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % replace_long_sequence(+Board, +Coords, +LongestWhiteSequence, +Player , -NewLongestWhiteSequence)
@@ -298,8 +332,11 @@ replace_long_sequence(Board, X-Y, CurrentLongestSequence, Player, NewLongestSequ
   dfs_sequence(Board, [X-Y], Player, [], Length),
   max(CurrentLongestSequence, Length, NewLongestSequence).
 
+
 % dfs_sequence(+Board, +ToVisit, +Player, +Visited, -Length)
+% performs the search in a contiguous same colored sequence, keeping track of its length
 dfs_sequence(_, [], _, _, 0).
+
 dfs_sequence(Board, [X-Y | ToVisit], Player, Visited, Length) :-
   \+ member(X-Y, Visited),
   findall(Neighbor, (
@@ -312,11 +349,13 @@ dfs_sequence(Board, [X-Y | ToVisit], Player, Visited, Length) :-
   append(Neighbors, ToVisit, NewToVisit),
   dfs_sequence(Board, NewToVisit, Player, [X-Y | Visited], SubLength),
   Length is SubLength + 1.
+
 dfs_sequence(Board, [_ | ToVisit], Player, Visited, Length) :-
   dfs_sequence(Board, ToVisit, Player, Visited, Length).
 
+
 % correct_top_left_corner(+Direction, +Color, +Coords, -CorrectCoords)
-% corrects the square where the dfs will perform
+% corrects the square where the dfs search will start, once the top left corner of a piece might not have the color of the player
 correct_top_left_corner(left, white, X-Y, X1-Y) :- X1 is X+1.
 correct_top_left_corner(left, black,  X-Y , X-Y).
 
@@ -328,6 +367,7 @@ correct_top_left_corner(down, black, X-Y, X-Y1) :- Y1 is Y+1.
 
 correct_top_left_corner(right, white, X-Y , X-Y).
 correct_top_left_corner(right, black, X-Y, X1-Y) :- X1 is X+1.
+
 
 % choose_move(+GameState, +Level, -Move)
 % returns the move chosen by the computer player
@@ -389,6 +429,7 @@ choose_move([Board,black,_-_,player-_,MaxLayer,_, _] , _ , Move) :-
   write('--------------------'),nl,
 
   get_move([Board,_,_,_,MaxLayer,_,_],X-Y,Orientation).
+
 
 % evaluate_move(+Board, +CurrentLongestSequence, +Player, +Piece, -ScoredPiece)
 % evaluates a move and gives it a score

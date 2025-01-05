@@ -1,7 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% BOARD
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % create_list(+Element,+Size,-List)
 % creates a list with an Element repeated Size times
 create_list(_, 0, []).
@@ -10,15 +6,13 @@ create_list(Element, Size, [Element|Sublist]):-
     Size1 is Size - 1,
     create_list(Element, Size1, Sublist).
 
+
 % create_board(+Element,+Size,-Board)
 % creates a list with size Size and then creates a list of lists with size Size
 create_board(Element, Size, Board):-
     create_list(Element, Size, List),
     create_list(List, Size, Board).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DISPLAY BOARD
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 char(black,9632).
 char(white,9633).
@@ -35,26 +29,32 @@ display_item(Item-_,X-Y,ValidMoves):-
     \+ member(Y-X-_,ValidMoves),
     char(Item, C), 
     put_code(C), write(' ').
+
 display_item(Item-_,X-Y,ValidMoves):- 
     member(Y-X-_,ValidMoves),
     big_char(Item, C), 
     put_code(C), write(' ').
 
+
 % display_row(+List)
 % display a row of the board
 display_row(Row,CurrentLine,ValidMoves) :-
    display_row(Row,0,CurrentLine,ValidMoves).
+
 display_row([],_,_,_).
+
 display_row([Item|RemainingItems],CurrentElement,CurrentLine,ValidMoves):-
     pair_vl(CurrentElement),
     display_item(Item,CurrentLine-CurrentElement,ValidMoves),
     NewCurrentElement is CurrentElement+1,
     display_row(RemainingItems,NewCurrentElement,CurrentLine,ValidMoves).
+
 display_row([Item|RemainingItems],CurrentElement,CurrentLine,ValidMoves):-
     \+ pair_vl(CurrentElement),
     display_item(Item,CurrentLine-CurrentElement,ValidMoves),
     NewCurrentElement is CurrentElement+1,
     display_row(RemainingItems,NewCurrentElement,CurrentLine,ValidMoves).
+
 
 % display_board(+Board)
 % display the whole board
@@ -66,7 +66,9 @@ display_board(Board,ValidMoves) :-
     display_board(Board,NewBoardSize,0,ValidMoves),
     write('   '),put_code(9632),hl(NewBoardSize,45),put_code(9632),nl,
     write('    '),hl(NewBoardSize,9633),nl.
+
 display_board([],_,_,_).
+
 display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
@@ -75,6 +77,7 @@ display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     display_row(Row,CurrentLine,ValidMoves),
     write('|'), write(''),put_code(9632), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
+
 display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     \+ pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
@@ -83,6 +86,7 @@ display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     display_row(Row,CurrentLine,ValidMoves),
     write('|'), write(''),put_code(9632), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
+
 
 % left
 /* bw */
@@ -110,10 +114,6 @@ orientation(down,[white,white,black,black]).
 orientation(neutral,[white,black,black,white]).
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CHANGE BOARD
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % place_piece(+LastBoard,+Coords,+Orientation,-NewBoard)
 % puts a given piece (based on its orientation) in the board
 place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
@@ -125,6 +125,7 @@ place_piece(LastBoard,X-Y,Orientation,NewBoard) :-
   place_square(NextBoard,X1-Y,C2,NextNextBoard),
   place_square(NextNextBoard,X-Y1,C3,NextNextNextBoard),
   place_square(NextNextNextBoard,X1-Y1,C4,NewBoard).
+
 
 % place_square(+LastBoard,+Coords,+NewValue,-NewBoard)
 % places a value in a square on the board
