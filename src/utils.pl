@@ -132,8 +132,8 @@ hl(BoardSize,Symbol) :-
 % displays a horizontal line of size BoardSize if CurrentLine is even
 pair_hl(CurrentLine,BoardSize) :-
     CurrentLine mod 2 =:= 0,
-    write('   '),put_code(9632),
-    hl(BoardSize,45),put_code(9632),nl.
+    write('   '),put_code(9633),
+    hl(BoardSize,45),put_code(9633),nl.
 
 
 % pair_vl(+CurrentLine,+BoardSize)

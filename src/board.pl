@@ -14,12 +14,12 @@ create_board(Element, Size, Board):-
     create_list(List, Size, Board).
 
 
-char(black,9632).
-char(white,9633).
+char(black,9633).
+char(white,9632).
 char(empty,32).
 
-big_char(black,9670).
-big_char(white,9671).
+big_char(black,9671).
+big_char(white,9670).
 big_char(empty,9974).
 
 
@@ -62,10 +62,10 @@ display_board(Board,ValidMoves) :-
     length(Board,BoardSize),
     NewBoardSize is BoardSize*3+1,
     number_line(BoardSize), nl,
-    write('y   '),hl(NewBoardSize,9633),nl,
+    write('y   '),hl(NewBoardSize,9632),nl,
     display_board(Board,NewBoardSize,0,ValidMoves),
-    write('   '),put_code(9632),hl(NewBoardSize,45),put_code(9632),nl,
-    write('    '),hl(NewBoardSize,9633),nl.
+    write('   '),put_code(9633),hl(NewBoardSize,45),put_code(9633),nl,
+    write('    '),hl(NewBoardSize,9632),nl.
 
 display_board([],_,_,_).
 
@@ -73,18 +73,18 @@ display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine), write(' '),put_code(9632),
+    write_number(DisplayCurrentLine), write(' '),put_code(9633),
     display_row(Row,CurrentLine,ValidMoves),
-    write('|'), write(''),put_code(9632), nl,
+    write('|'), write(''),put_code(9633), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
 
 display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     \+ pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine), write(' '),put_code(9632),
+    write_number(DisplayCurrentLine), write(' '),put_code(9633),
     display_row(Row,CurrentLine,ValidMoves),
-    write('|'), write(''),put_code(9632), nl,
+    write('|'), write(''),put_code(9633), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
 
 
