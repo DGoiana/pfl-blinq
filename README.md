@@ -183,6 +183,8 @@ In the game, the user must choose the coordinates of the piece they want to plac
 
 According to the game's rules, the game ends when either a player connects the two sides of the board with their color or when there is no possible move to be done.
 
+![alt text](image.png)
+
 ## Conclusions
 
 This project accomplishes the task given, as it is an implementation of the game Blinq. There were some difficulties in the development, for example with the algorithm to determine the best move for the hard bot or how to evaluate the possible moves for a given board state.
