@@ -40,12 +40,12 @@ convert_orientation(4,down).
 get_orientation(Orientation) :-
   write('Possible Orientations:'),nl,
   nl,
-  write('1- bw  2- wb'), nl,
-  write('   bw     wb'), nl,
+  write('1- '),put_code(9632),write(' '),put_code(9633), write(' 2- '),put_code(9633),write(' '),put_code(9632), nl,
+  write('   '),put_code(9632),write(' '),put_code(9633), write('    '),put_code(9633),write(' '),put_code(9632), nl,
   nl,
-  write('3- bb  4- ww'), nl,
-  write('   ww     bb'), nl,
-  nl,
+  write('3- '),put_code(9632),write(' '),put_code(9632), write(' 2- '),put_code(9633),write(' '),put_code(9633), nl,
+  write('   '),put_code(9633),write(' '),put_code(9633), write('    '),put_code(9632),write(' '),put_code(9632), nl,
+  nl, 
   write('Orientation:'),
   get_input(1,4,OrientationInput),
   convert_orientation(OrientationInput,Orientation).

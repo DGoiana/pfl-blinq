@@ -20,24 +20,25 @@ create_board(Element, Size, Board):-
 % DISPLAY BOARD
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-char(black,'b').
-char(white,'w').
-char(empty,' ').
+char(black,9632).
+char(white,9633).
+char(empty,32).
 
-big_char(black,'B').
-big_char(white,'W').
-big_char(empty,'*').
+big_char(black,9670).
+big_char(white,9671).
+big_char(empty,9974).
+
 
 % display_item(+Item)
 % prints an element
 display_item(Item-_,X-Y,ValidMoves):- 
     \+ member(Y-X-_,ValidMoves),
     char(Item, C), 
-    write(C), write(' ').
+    put_code(C), write(' ').
 display_item(Item-_,X-Y,ValidMoves):- 
     member(Y-X-_,ValidMoves),
     big_char(Item, C), 
-    write(C), write(' ').
+    put_code(C), write(' ').
 
 % display_row(+List)
 % display a row of the board
@@ -61,26 +62,26 @@ display_board(Board,ValidMoves) :-
     length(Board,BoardSize),
     NewBoardSize is BoardSize*3+1,
     number_line(BoardSize), nl,
-    write('y   '),hl(NewBoardSize,'W'),nl,
+    write('y   '),hl(NewBoardSize,9633),nl,
     display_board(Board,NewBoardSize,0,ValidMoves),
-    write('   B'),hl(NewBoardSize,'-'),write('B'),nl,
-    write('    '),hl(NewBoardSize,'W'),nl.
+    write('   '),put_code(9632),hl(NewBoardSize,45),put_code(9632),nl,
+    write('    '),hl(NewBoardSize,9633),nl.
 display_board([],_,_,_).
 display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine), write(' '),write('B'),
+    write_number(DisplayCurrentLine), write(' '),put_code(9632),
     display_row(Row,CurrentLine,ValidMoves),
-    write('|'), write(''),write('B'), nl,
+    write('|'), write(''),put_code(9632), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
 display_board([Row|RemainingRows],BoardSize,CurrentLine,ValidMoves):-
     \+ pair_hl(CurrentLine,BoardSize),
     NewCurrentLine is CurrentLine+1,
     DisplayCurrentLine is (BoardSize//3 -1)-CurrentLine+1,
-    write_number(DisplayCurrentLine), write(' '),write('B'),
+    write_number(DisplayCurrentLine), write(' '),put_code(9632),
     display_row(Row,CurrentLine,ValidMoves),
-    write('|'), write(''),write('B'), nl,
+    write('|'), write(''),put_code(9632), nl,
     display_board(RemainingRows,BoardSize,NewCurrentLine,ValidMoves).
 
 % left
