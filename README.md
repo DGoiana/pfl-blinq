@@ -17,75 +17,7 @@ There are no necessary extensions or different fonts in this game.
 
 There are two different ways to install this game, first by cloning the repository and the second is by downloading via the zip file provided in the project submission.
 
-### Clone repository
-
-1. clone the repository:
-
-```bash
-git clone https://github.com/DGoiana/pfl-blinq/
-```
-
-2. change to src folder:
-
-```bash
-cd src/
-```
-
-3. open the sicstus interpreter:
-
-```bash
-sicsuts
-```
-
-4. import the game:
-
-```bash
-consult(game).
-```
-
-5. execute the game predicate:
-
-```bash
-play.
-```
-
-### Via Project Submission
-
-1. unzip the game folder:
-
-```bash
-unzip PFL_TP2_T04_Blinq_1.zip
-```
-
-2. change to src folder:
-
-```bash
-cd PFL_TP2_T04_Blinq_1/
-```
-
-2. change to src folder:
-
-```bash
-cd src/
-```
-
-3. open the sicstus interpreter:
-
-```bash
-sicsuts
-```
-
-4. import the game:
-
-```bash
-consult(game).
-```
-
-5. execute the game predicate:
-
-```bash
-play.
-```
+Go into the source folder, enter sictus, import the game and write 'play.'.
 
 ## Description of the game
 
@@ -94,8 +26,6 @@ BLINQ was developed in 2020 by Néstor Romeral Andrés and published by nestorga
 BLINQ is a two player connection game where players have coloured squared tiles and they have to connect the two sides of the board with their color.
 
 There is also a simple stacking rule, where the players can put squares above 2x2 plataform of pieces.
-
-![alt text](docs/physical.png)
 
 This image is from the physical version of the game, where the stacking rule is clearly visible. However, as our game is 2d it was a challenge to make this work.
 
@@ -149,7 +79,7 @@ After the configuration is set, the game starts.
 
 The game state is the main component of the game, it holds the most essential information about the game at every moment.
 
-![alt text](docs/game_state.png)
+<img src="docs/game_state.png" width=250 height=400>
 
 It is composed by the state of the board (CurrentBoard), the player which is moving (CurrentPlayer), information about the type of player and its pieces (PlayerType-Pieces), the maximum layer of the board (MaxLayer) and the longest sequences for black and white pieces (LongestSequenceWhite-LongestSequenceBlack).
 
@@ -175,17 +105,15 @@ User interaction on this game is done by the player choosing a number in a range
 
 Users are responsible to choose the game's configuration at the beginning and, depending on the mode that they chose, have to choose their moves.
 
-![alt text](docs/game_configuration.png)
 
 In the game, the user must choose the coordinates of the piece they want to place and then its orientation. Based on the possibility of the move, they are shown the next game state or a prompt to choose another move.
 
-![alt text](docs/choose_move.png)
 
 ### End Game
 
 According to the game's rules, the game ends when either a player connects the two sides of the board with their color or when there is no possible move to be done.
 
-![alt text](docs/image.png)
+<img src="docs/image.png" width=250 height=400>
 
 ## Conclusions
 
