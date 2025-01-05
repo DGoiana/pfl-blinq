@@ -4,12 +4,12 @@
 
 This is the readme file for the second project on the Functional and Logical Programming course in the final year of the Bachelors at FEUP. The game developed is BLINQ, a game where the players have to put pieces to connect colors to the extreme sides of the board.
 
-+ Project Namge: pfl-blinq
-+ Participants:
-  + Rubem Neto (up202207086) - Contribution (50%)
-  + Diogo Goiana (up202207086) - Contribution (50%)
-+ Group: 01
-+ TP Class: 3LEIC04
+- Project Namge: pfl-blinq
+- Participants:
+  - Rubem Neto (up202207086) - Contribution (50%)
+  - Diogo Goiana (up202207086) - Contribution (50%)
+- Group: 01
+- TP Class: 3LEIC04
 
 There are no necessary extensions or different fonts in this game.
 
@@ -20,22 +20,31 @@ There are two different ways to install this game, first by cloning the reposito
 ### Clone repository
 
 1. clone the repository:
+
 ```bash
 git clone https://github.com/DGoiana/pfl-blinq/
 ```
+
 2. change to src folder:
+
 ```bash
 cd src/
 ```
+
 3. open the sicstus interpreter:
+
 ```bash
 sicsuts
 ```
+
 4. import the game:
+
 ```bash
 consult(game).
 ```
+
 5. execute the game predicate:
+
 ```bash
 play.
 ```
@@ -43,30 +52,40 @@ play.
 ### Via Project Submission
 
 1. unzip the game folder:
+
 ```bash
 unzip PFL_TP2_T04_Blinq_1.zip
 ```
+
 2. change to src folder:
+
 ```bash
 cd PFL_TP2_T04_Blinq_1/
 ```
+
 2. change to src folder:
+
 ```bash
 cd src/
 ```
+
 3. open the sicstus interpreter:
+
 ```bash
 sicsuts
 ```
+
 4. import the game:
+
 ```bash
 consult(game).
 ```
+
 5. execute the game predicate:
+
 ```bash
 play.
 ```
-
 
 ## Description of the game
 
@@ -94,7 +113,6 @@ The official rule book is available at this [link](https://nestorgames.com/ruleb
 
 More information about the game in [link](https://boardgamegeek.com/boardgame/271266/blinq).
 
-
 ## Considerations for game extensions
 
 There are two possible big considerations for game extensions. The first is changing the position of the neutral piece in the beginning of the game and the second is supporting dynamic board sizes.
@@ -113,7 +131,7 @@ This section summarizes the implementation of the game and explains its inner wo
 
 The game configuration is defined by to different components, the Board Size and the Game Type.
 
-The board size, as on its name, defines the size of the board where the game will be played. The board size needs to be in the range from 3 to 10. 
+The board size, as on its name, defines the size of the board where the game will be played. The board size needs to be in the range from 3 to 10.
 
 We chose this range because, it not possible to have a board with a size less than 3x3 and boards with size bigger than 10x10 don't look nice in the terminal environment.
 
@@ -121,7 +139,7 @@ There are 4 game types support by the game: Bot-Bot,Bot-Player,Player-Bot and Pl
 
 After a Game Type which contains a bot is chosen, the user must choose the bot's difficulty. There are 2 possible difficulties for a bot, there is the hard bot and the easy bot.
 
-The easy bot just chooses moves randomly without any regards to the current state of the game. 
+The easy bot just chooses moves randomly without any regards to the current state of the game.
 
 The hard bot analyzes the current state of the game and chooses a move according to its position. When choosing a new move, the bot priorites to aspects, which move would increase the biggest sequence of their pieces and if the would get closer to the other size of the board.
 
@@ -143,29 +161,13 @@ A move is responsible for changing the game's current state, by changing the sta
 
 When choosing a move, the user must provide its coordinates and its orientation, since there are 4 possible orientations for a given piece in the game:
 
-```
-% left
-/* bw */
-/* bw */
-
-% right
-/* wb */
-/* wb */
-
-% up
-/* bb */
-/* ww */
-
-% down
-/* ww */
-/* bb */
-```
+![possible_orientations](docs/possible_orientations.png)
 
 The coordinates of the board starts in (1,1) on the left bottom corner, but this is only for the user. In the code, the coordinates gets converted to a board that starts on (0,0).
 
 It is also important to note, that the X coordinates grows from left to right and the Y coordinate grows from down to up.
 
-The game is based on a finite number of possible moves, therefore there is a representation for the possible moves. The possible moves for empty squares are represented as a '*' and the possible moves above a plataform are represented differently for white and black squares. For the white pieces is a 'W' and for the black pieces it's a 'B'.
+The game is based on a finite number of possible moves, therefore there is a representation for the possible moves. The possible moves for empty squares are represented as a '\*' and the possible moves above a plataform are represented differently for white and black squares. For the white pieces is a 'W' and for the black pieces it's a 'B'.
 
 ### User Interaction
 
@@ -183,7 +185,7 @@ In the game, the user must choose the coordinates of the piece they want to plac
 
 According to the game's rules, the game ends when either a player connects the two sides of the board with their color or when there is no possible move to be done.
 
-![alt text](image.png)
+![alt text](docs/image.png)
 
 ## Conclusions
 
@@ -198,4 +200,3 @@ In conclusion, the project was overall satisfying and it accomplishes its goal.
 [Sicstus documentation](https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/) \
 [Blinq Rule Book](https://nestorgames.com/rulebooks/BLINQ_A5_EN.pdf) \
 [BoardGameGeek Blinq's Page](https://boardgamegeek.com/boardgame/271266/blinq)
-
