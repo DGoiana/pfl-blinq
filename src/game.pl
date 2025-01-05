@@ -27,22 +27,29 @@ play :-
 
 % game_loop(+GameState)
 % loop of the main game
-game_loop([Board,_,_-0,_-_,_,_,_]) :-
+game_loop(GameState) :-
+  GameState = [Board,_,_-0,_-_,_,_,_],
   show_winner(draw),
-  display_board(Board,[]), !.
-game_loop([Board,_,_-_,_-0,_,_,_]) :-
+  display_board(Board,[]).
+game_loop(GameState) :-
+  GameState = [Board,_,_-_,_-0,_,_,_],
   show_winner(draw),
-  display_board(Board,[]), !.
+  display_board(Board,[]).
+game_loop(GameState) :-
+  GameState = [Board,_,_,_,_,_,_],
+  game_over(GameState,draw),
+  show_winner(draw),
+  display_board(Board,[]).
 game_loop(GameState) :-
   GameState = [Board,_,_,_,_,_,_],
   game_over(GameState,white),
   show_winner(white),
-  display_board(Board,[]), !.
+  display_board(Board,[]).
 game_loop(GameState) :-
   GameState = [Board,_,_,_,_,_,_],
   game_over(GameState,black),
   show_winner(black),
-  display_board(Board,[]), !.
+  display_board(Board,[]).
 game_loop(GameState) :-
   display_game(GameState),
   choose_move(GameState, _ , Move),
@@ -161,7 +168,11 @@ game_over([Board,_,_,_,_,_,_],white) :-
   white_wins(Board), !.
 game_over([Board,_,_,_,_,_,_],black) :- 
   black_wins(Board), !.
-game_over(_,draw).
+game_over(GameState,draw) :-
+  valid_moves(GameState,Moves),
+  write(MovesLength),
+  length(Moves,MovesLength),
+  MovesLength = 0.
 
 % black_wins(+Board)
 % checks if black has a winning board
