@@ -39,9 +39,9 @@ The game game ends when one of the players has no way to complete the board (los
 
 If the players run out of pieces and a connection has not been made, the game ends in a draw.
 
-The official rule book is available at this [link](https://nestorgames.com/rulebooks/BLINQ_A5_EN.pdf).
+The official rule book is available at this https://nestorgames.com/rulebooks/BLINQ_A5_EN.pdf.
 
-More information about the game in [link](https://boardgamegeek.com/boardgame/271266/blinq).
+More information about the game in https://boardgamegeek.com/boardgame/271266/blinq.
 
 ## Considerations for game extensions
 
@@ -105,6 +105,7 @@ User interaction on this game is done by the player choosing a number in a range
 
 Users are responsible to choose the game's configuration at the beginning and, depending on the mode that they chose, have to choose their moves.
 
+<img src="docs/game_configuration.png" width=150 height=200>
 
 In the game, the user must choose the coordinates of the piece they want to place and then its orientation. Based on the possibility of the move, they are shown the next game state or a prompt to choose another move.
 
@@ -125,6 +126,6 @@ In conclusion, the project was overall satisfying and it accomplishes its goal.
 
 ## Bibliography
 
-[Sicstus documentation](https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/) \
-[Blinq Rule Book](https://nestorgames.com/rulebooks/BLINQ_A5_EN.pdf) \
-[BoardGameGeek Blinq's Page](https://boardgamegeek.com/boardgame/271266/blinq)
+https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/ \
+https://nestorgames.com/rulebooks/BLINQ_A5_EN.pdf \
+https://boardgamegeek.com/boardgame/271266/blinq
