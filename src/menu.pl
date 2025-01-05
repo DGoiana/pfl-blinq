@@ -52,8 +52,8 @@ get_orientation(Orientation) :-
 
 % get_orientation(+GameState,-Coords,-Orientation)
 % gets the desired move from the user
-get_move([Board,_,_,_,MaxLayer,_],X-Y,Orientation) :-
-  valid_moves([Board,_,_,_,MaxLayer,_],ValidMoves),
+get_move([Board,_,_,_,MaxLayer,_,_],X-Y,Orientation) :-
+  valid_moves([Board,_,_,_,MaxLayer,_,_],ValidMoves),
 
   length(Board,BoardSize),
   repeat,
