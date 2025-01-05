@@ -78,6 +78,7 @@ validate_valid_move(X-Y-Orientation,ValidMoves) :-
 % menu(-GameConfig)
 % prints menu and defines GameConfig
 menu([BoardSize,GameType]) :- 
+  nl,
   write('Blinq'), nl,
   write('Board Size (3-10): '),
   get_input(3,10,BoardSize),

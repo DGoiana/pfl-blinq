@@ -1,13 +1,5 @@
 % main game file
 
-% Appealing and intuitive 
-% visualizations will be valued. Flexible  game state representations and visualization predicates will 
-% also  be  valued,  for  instance  those  that  work  with  any    size
-
-% If any configuration is required (beyond the standard installation of the software), or a font other 
-% than the default one is used, this must be expressed in the README file, which must also include the steps 
-% required to configure and/or install the necessary components (on Windows and Linux)
-
 :- consult(board).
 :- consult(utils).
 :- consult(menu).
@@ -23,7 +15,24 @@ default(empty-0).
 play :- 
   menu(GameConfig),
   initial_state(GameConfig,GameState),
-  game_loop(GameState).
+  game_loop(GameState), !,
+  play_again.
+
+play_again :-
+  nl,
+  write('Blinq'),nl,
+  write('--------------------'),nl,
+  write('Play Again?'), nl,
+  write('--------------------'),nl,
+  write('1 - Yes'), nl,
+  write('2 - No'), nl,
+  write('Your Input:'),
+  read_number(Value),
+  between(1,2,Value),
+  act_restart(Value), !.
+
+act_restart(2) :- !,fail.
+act_restart(1) :- !,play.
 
 % game_loop(+GameState)
 % loop of the main game
@@ -170,9 +179,7 @@ game_over([Board,_,_,_,_,_,_],black) :-
   black_wins(Board), !.
 game_over(GameState,draw) :-
   valid_moves(GameState,Moves),
-  write(MovesLength),
-  length(Moves,MovesLength),
-  MovesLength = 0.
+  length(Moves,0).
 
 % black_wins(+Board)
 % checks if black has a winning board
