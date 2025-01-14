@@ -7,7 +7,7 @@ This is the readme file for the second project on the Functional and Logical Pro
 - Project Namge: pfl-blinq
 - Participants:
   - Rubem Neto (up202207086) - Contribution (50%)
-  - Diogo Goiana (up202207086) - Contribution (50%)
+  - Diogo Goiana (uo202207944) - Contribution (50%)
 - Group: 01
 - TP Class: 3LEIC04
 
